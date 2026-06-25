@@ -9,12 +9,11 @@ ENV PORT=8501
 # Set workspace directory
 WORKDIR /app
 
-# Install system dependencies (build-essential helps compile umap/scikit-learn wheels if necessary)
+# Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
     curl \
-    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Copy requirements and install
 COPY requirements.txt .
