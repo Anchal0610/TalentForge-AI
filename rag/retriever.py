@@ -1,11 +1,11 @@
 from typing import List, Dict, Any, Optional
-from services.qdrant_service import qdrant_service
+from services.pinecone_service import pinecone_service
 from rag.embeddings import embedding_pipeline
 from utils.logger import logger
 
 class RAGRetriever:
-    def __init__(self, collection_name: str = "nexora_docs"):
-        self.collection_name = collection_name
+    def __init__(self, default_index: str = "nexora-career-index"):
+        self.index_name = default_index
 
     def retrieve(
         self, 
@@ -13,12 +13,12 @@ class RAGRetriever:
         limit: int = 4, 
         filter_payload: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
-        """Performs semantic similarity search for a query."""
-        logger.info(f"Retrieving context for query: '{query}'")
+        """Performs semantic similarity search for a query using Pinecone."""
+        logger.info(f"Retrieving context for query: '{query}' via Pinecone")
         query_vector = embedding_pipeline.embed_text(query)
         
-        results = qdrant_service.similarity_search(
-            collection_name=self.collection_name,
+        results = pinecone_service.similarity_search(
+            index_name=self.index_name,
             query_vector=query_vector,
             limit=limit,
             filter_payload=filter_payload

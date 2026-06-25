@@ -58,9 +58,10 @@ Nexora AI is a production-ready Career Intelligence Platform designed to transfo
 │   └── tsne_reducer.py
 ├── services/                  # Core External Services Wrappers
 │   ├── mistral_ocr.py
-│   ├── openai_service.py
-│   ├── qdrant_service.py
+│   ├── mistral_service.py
+│   ├── pinecone_service.py
 │   └── ats_service.py
+
 ├── database/                  # Local Database (SQLite)
 │   └── connection.py
 ├── models/                    # Data Schemas (Pydantic / SQL)

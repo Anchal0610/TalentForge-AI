@@ -4,7 +4,7 @@ from services.mistral_ocr import mistral_ocr_service
 from rag.chunking import document_chunker
 from rag.vector_store import vector_store
 from rag.retriever import retriever
-from services.openai_service import openai_service
+from services.mistral_service import mistral_service
 from utils.logger import logger
 
 st.set_page_config(page_title="Document Intelligence & RAG", page_icon="📚", layout="wide")
@@ -76,7 +76,7 @@ with col1:
             with st.spinner("Summarizing raw contents..."):
                 raw_txt = st.session_state["raw_document_text"]
                 prompt = f"Please summarize the main concepts and technical learnings of this text in a bulleted outline:\n\n{raw_txt[:6000]}"
-                summary = openai_service.generate_structured_completion(
+                summary = mistral_service.generate_structured_completion(
                     prompt=prompt,
                     system_instruction="You are an expert technical editor. Summarize the text clearly.",
                     response_model=str # Fallback handles string inputs nicely
@@ -108,10 +108,10 @@ with col2:
                 
                 # Generate completion using direct Chat Completion fallback inside service
                 # We can call completions endpoint via raw model helper or service fallback
-                if openai_service.client:
+                if mistral_service.client:
                     try:
-                        res = openai_service.client.chat.completions.create(
-                            model=openai_service.model,
+                        res = mistral_service.client.chat.complete(
+                            model=mistral_service.model,
                             messages=[
                                 {"role": "system", "content": "You are a helpful Career Intelligence Assistant. Answer the question using ONLY the provided document context."},
                                 {"role": "user", "content": prompt}
@@ -119,7 +119,7 @@ with col2:
                         )
                         answer = res.choices[0].message.content
                     except Exception as err:
-                        answer = f"Error calling ChatCompletion API: {str(err)}"
+                        answer = f"Error calling Mistral Chat API: {str(err)}"
                 else:
                     answer = f"Mock Answer (Client in offline/mock mode) using context from {st.session_state.get('active_doc_loaded', 'Document')}"
                 

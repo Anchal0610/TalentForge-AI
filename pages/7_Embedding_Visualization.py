@@ -1,6 +1,6 @@
 import streamlit as st
 import numpy as np
-from services.openai_service import openai_service
+from services.mistral_service import mistral_service
 from visualization.embedding_plot import embedding_plotter
 from utils.logger import logger
 
@@ -77,7 +77,7 @@ with col1:
         # Generate embeddings
         embeddings = []
         for text in filtered_labels:
-            emb = openai_service.get_embedding(text)
+            emb = mistral_service.get_embedding(text)
             embeddings.append(emb)
             
         # Draw scatter

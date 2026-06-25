@@ -1,11 +1,11 @@
 from typing import List, Dict, Any, Optional
-from services.qdrant_service import qdrant_service
+from services.pinecone_service import pinecone_service
 from rag.embeddings import embedding_pipeline
 from utils.logger import logger
 
 class VectorStoreManager:
-    def __init__(self, default_collection: str = "nexora_docs"):
-        self.collection_name = default_collection
+    def __init__(self, default_index: str = "nexora-career-index"):
+        self.index_name = default_index
 
     def index_document(
         self, 
@@ -13,7 +13,7 @@ class VectorStoreManager:
         chunks: List[str], 
         metadata_common: Optional[Dict[str, Any]] = None
     ) -> List[str]:
-        """Generates embeddings and indexing keys for chunks, then upserts to Qdrant."""
+        """Generates embeddings and indexing keys for chunks, then upserts to Pinecone."""
         if not chunks:
             logger.warning(f"No chunks provided for document: {doc_name}")
             return []
@@ -30,8 +30,8 @@ class VectorStoreManager:
                 meta.update(metadata_common)
             metadatas.append(meta)
             
-        point_ids = qdrant_service.upsert_chunks(
-            collection_name=self.collection_name,
+        point_ids = pinecone_service.upsert_chunks(
+            index_name=self.index_name,
             texts=chunks,
             embeddings=embeddings,
             metadatas=metadatas

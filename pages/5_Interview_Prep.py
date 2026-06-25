@@ -1,5 +1,5 @@
 import streamlit as st
-from services.openai_service import openai_service
+from services.mistral_service import mistral_service
 from models.schemas import InterviewQuestion, InterviewAnswer
 from utils.logger import logger
 import json
@@ -54,10 +54,10 @@ with tab1:
             try:
                 # We can request standard structured generation or parse outputs
                 # For Phase 1, we will generate simulated Q&A lists.
-                if openai_service.client:
+                if mistral_service.client:
                     # In production, we'd query structured endpoints
-                    res = openai_service.client.chat.completions.create(
-                        model=openai_service.model,
+                    res = mistral_service.client.chat.complete(
+                        model=mistral_service.model,
                         messages=[
                             {"role": "system", "content": "You are a lead interviewer. Output a list of 3 questions with their Beginner, Intermediate, Expert responses in JSON format."},
                             {"role": "user", "content": prompt}
@@ -137,10 +137,10 @@ with tab2:
                     3. How to improve the answer.
                     """
                     
-                    if openai_service.client:
+                    if mistral_service.client:
                         try:
-                            res = openai_service.client.chat.completions.create(
-                                model=openai_service.model,
+                            res = mistral_service.client.chat.complete(
+                                model=mistral_service.model,
                                 messages=[
                                     {"role": "system", "content": "You are a technical interviewer grading answers. Output your evaluation in JSON format."},
                                     {"role": "user", "content": prompt}

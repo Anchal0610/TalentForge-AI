@@ -1,9 +1,8 @@
 import streamlit as st
 import os
-import sqlite3
-from database.connection import get_db_path, get_db_connection
-from services.qdrant_service import qdrant_service
-from services.openai_service import openai_service
+from database.connection import get_db_path, get_db_connection, is_postgres
+from services.pinecone_service import pinecone_service
+from services.mistral_service import mistral_service
 from services.mistral_ocr import mistral_ocr_service
 from utils.logger import logger
 
@@ -25,7 +24,7 @@ st.markdown("""
 <div class="glass-card">
     <h3>Engine Integrity Control Center</h3>
     <p style="color: #94A3B8;">
-        Run live checks on vector storage points, relational schema records, and API connectivity modules. Monitor active service models and review system log parameters.
+        Run live checks on vector storage indexes, relational schema tables, and API connectivity modules. Monitor active service models and review system log parameters.
     </p>
 </div>
 """, unsafe_allow_value=True)
@@ -36,32 +35,41 @@ with col1:
     st.subheader("Platform Connections Health Check")
     
     if st.button("Execute Diagnostic Suite Check", type="primary"):
-        # 1. Database Check
+        # 1. Database Check (Supabase vs SQLite)
         try:
-            db_path = get_db_path()
+            postgres_mode = is_postgres()
+            db_type = "Supabase PostgreSQL" if postgres_mode else "Local SQLite"
+            
             with get_db_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-                tables = [r[0] for r in cursor.fetchall()]
-            st.success(f"✅ SQLite Connection Healthy (Path: {db_path})")
+                if postgres_mode:
+                    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
+                    tables = [r['table_name'] for r in cursor.fetchall()]
+                else:
+                    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+                    tables = [r[0] for r in cursor.fetchall()]
+                    
+            st.success(f"✅ {db_type} Connection Healthy")
             st.info(f"Registered Schema Tables: {', '.join(tables)}")
         except Exception as e:
-            st.error(f"❌ SQLite database offline: {str(e)}")
+            st.error(f"❌ Database connection offline: {str(e)}")
             
-        # 2. Qdrant Client Check
+        # 2. Pinecone Client Check
         try:
-            q_info = qdrant_service.client.get_collections()
-            st.success("✅ Qdrant Connection Active")
-            cols = [col.name for col in q_info.collections]
-            st.info(f"Active Collections: {', '.join(cols) if cols else 'None'}")
+            if pinecone_service.pc:
+                active_indexes = [idx.name for idx in pinecone_service.pc.list_indexes()]
+                st.success("✅ Pinecone Vector Connection Active")
+                st.info(f"Active Indexes: {', '.join(active_indexes) if active_indexes else 'None'}")
+            else:
+                st.warning("⚠️ Pinecone Vector Client running in demo/mock fallback state")
         except Exception as e:
-            st.error(f"❌ Qdrant Vector Client connection error: {str(e)}")
+            st.error(f"❌ Pinecone Vector Client connection error: {str(e)}")
             
-        # 3. OpenAI Connectivity
-        if openai_service.client:
-            st.success(f"✅ OpenAI API Key Validated (Active LLM: {openai_service.model})")
+        # 3. Mistral AI Model Connectivity
+        if mistral_service.client:
+            st.success(f"✅ Mistral AI Client Validated (Active LLM: {mistral_service.model})")
         else:
-            st.warning("⚠️ OpenAI operating in demo/mock fallback state (Key not configured)")
+            st.warning("⚠️ Mistral LLM operating in demo/mock fallback state (Key not configured)")
             
         # 4. Mistral OCR Config
         if mistral_ocr_service.client:
@@ -72,22 +80,22 @@ with col1:
 with col2:
     st.subheader("Database Schema Metrics")
     try:
+        postgres_mode = is_postgres()
         with get_db_connection() as conn:
             cursor = conn.cursor()
             
-            # Seed mock user if database is completely empty so app features have a profile reference
-            cursor.execute("SELECT COUNT(*) FROM users")
-            count = cursor.fetchone()[0]
-            if count == 0:
-                cursor.execute("INSERT INTO users (name, email, target_role, readiness_score) VALUES ('Jane Doe', 'jane@example.com', 'MLOps Engineer', 74.5)")
-                cursor.execute("INSERT INTO resumes (user_id, filename, raw_text, ats_score) VALUES (1, 'mock_resume.pdf', 'Expert in Python development, Docker virtualization, and PostgreSQL databases.', 82.0)")
-                
-            cursor.execute("SELECT COUNT(*) FROM users")
-            user_count = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM resumes")
-            resume_count = cursor.fetchone()[0]
-            cursor.execute("SELECT COUNT(*) FROM mock_interviews")
-            mock_count = cursor.fetchone()[0]
+            # Helper to execute count queries based on connection type
+            def get_row_count(table_name):
+                try:
+                    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+                    res = cursor.fetchone()
+                    return res[0] if isinstance(res, tuple) else res.get('count', 0)
+                except Exception:
+                    return 0
+                    
+            user_count = get_row_count("users")
+            resume_count = get_row_count("resumes")
+            mock_count = get_row_count("mock_interviews")
             
             st.write(f"- **Total Registered Users:** `{user_count}`")
             st.write(f"- **Total Resumes Parsed:** `{resume_count}`")

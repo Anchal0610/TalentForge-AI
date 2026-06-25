@@ -1,6 +1,7 @@
 import streamlit as st
-from services.openai_service import openai_service
+from services.mistral_service import mistral_service
 from models.schemas import CareerRecommendation
+
 
 st.set_page_config(page_title="Career Advisor & Recommendations", page_icon="🧭", layout="wide")
 
@@ -56,11 +57,12 @@ with col2:
             system_instruction = "You are a senior tech career strategist and recruiting expert. Output predictions matching the requested schema."
             
             try:
-                rec: CareerRecommendation = openai_service.generate_structured_completion(
+                rec: CareerRecommendation = mistral_service.generate_structured_completion(
                     prompt=prompt,
                     system_instruction=system_instruction,
                     response_model=CareerRecommendation
                 )
+
                 
                 st.success("Advisor recommendations successfully prepared!")
                 

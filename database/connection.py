@@ -1,107 +1,133 @@
-import sqlite3
 import os
 from contextlib import contextmanager
 from utils.logger import logger
 
-DB_FILE = "nexora_career.db"
+# Import database packages dynamically for fallback safety
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    POSTGRES_AVAILABLE = True
+except ImportError:
+    POSTGRES_AVAILABLE = False
 
-def get_db_path() -> str:
-    """Returns the absolute path to the SQLite database."""
-    # Read from environment if configured, fallback to default nexora_career.db
-    db_url = os.getenv("DATABASE_URL", f"sqlite:///{DB_FILE}")
-    if db_url.startswith("sqlite:///"):
-        return db_url.replace("sqlite:///", "")
-    return DB_FILE
+import sqlite3
+
+def get_db_url() -> str:
+    return os.getenv("DATABASE_URL", "")
+
+def is_postgres() -> bool:
+    url = get_db_url()
+    return POSTGRES_AVAILABLE and (url.startswith("postgresql://") or url.startswith("postgres://"))
 
 @contextmanager
 def get_db_connection():
-    """Context manager for SQLite connections."""
-    db_path = get_db_path()
-    conn = sqlite3.connect(db_path)
+    """Context manager supplying database sessions. Dynamically handles PostgreSQL or SQLite."""
+    url = get_db_url()
+    
+    if is_postgres():
+        try:
+            # Connect to PostgreSQL (Supabase)
+            conn = psycopg2.connect(url)
+            # Make sure it behaves like Row/Dict cursor
+            cursor_factory = RealDictCursor
+            yield conn
+            conn.commit()
+            conn.close()
+            return
+        except Exception as e:
+            logger.error(f"PostgreSQL Connection failed: {str(e)}. Falling back to local SQLite.")
+
+    # Fallback to local SQLite
+    db_file = "nexora_career.db"
+    conn = sqlite3.connect(db_file)
     conn.row_factory = sqlite3.Row
     try:
         yield conn
         conn.commit()
     except Exception as e:
         conn.rollback()
-        logger.error(f"Database transaction error: {str(e)}")
+        logger.error(f"SQLite transaction error: {str(e)}")
         raise e
     finally:
         conn.close()
 
 def init_db():
-    """Initializes tables for Phase 1 Career Intelligence Ecosystem."""
-    logger.info("Initializing SQLite database...")
-    db_path = get_db_path()
+    """Initializes tables using dialect-correct PostgreSQL/SQLite statements."""
+    logger.info("Initializing Database schemas...")
+    
+    postgres_mode = is_postgres()
+    
+    # Dialect differences
+    primary_key_syntax = "SERIAL PRIMARY KEY" if postgres_mode else "INTEGER PRIMARY KEY AUTOINCREMENT"
+    json_type = "JSONB" if postgres_mode else "TEXT"
+    timestamp_syntax = "CURRENT_TIMESTAMP"
     
     with get_db_connection() as conn:
         cursor = conn.cursor()
         
         # User Profiles Table
-        cursor.execute("""
+        cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE,
-                target_role TEXT,
+                id {primary_key_syntax},
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE,
+                target_role VARCHAR(255),
                 readiness_score REAL DEFAULT 0.0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT {timestamp_syntax}
             )
         """)
         
         # Resumes Table
-        cursor.execute("""
+        cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS resumes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id {primary_key_syntax},
                 user_id INTEGER,
-                filename TEXT,
+                filename VARCHAR(255),
                 raw_text TEXT,
                 ats_score REAL,
-                skills_json TEXT,  -- Extracted skills list as JSON
-                insights_json TEXT, -- ATS suggestions as JSON
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
+                skills_json {json_type},
+                insights_json {json_type},
+                created_at TIMESTAMP DEFAULT {timestamp_syntax}
             )
         """)
         
         # Skill Gap Table
-        cursor.execute("""
+        cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS skill_gaps (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id {primary_key_syntax},
                 user_id INTEGER,
-                target_role TEXT,
-                missing_skills TEXT, -- JSON array of missing skills
-                priority_list TEXT,  -- JSON list of priorities and effort
-                last_calculated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
+                target_role VARCHAR(255),
+                missing_skills TEXT,
+                priority_list TEXT,
+                last_calculated TIMESTAMP DEFAULT {timestamp_syntax}
             )
         """)
         
         # Document Chunk Metadata Table
-        cursor.execute("""
+        cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS doc_chunks (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                doc_name TEXT NOT NULL,
+                id {primary_key_syntax},
+                doc_name VARCHAR(255) NOT NULL,
                 chunk_index INTEGER,
                 content TEXT,
-                vector_id TEXT, -- Qdrant Point UUID reference
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                vector_id VARCHAR(255),
+                created_at TIMESTAMP DEFAULT {timestamp_syntax}
             )
         """)
         
-        # Mock Interviews & Question Bank Table
-        cursor.execute("""
+        # Mock Interviews Table
+        cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS mock_interviews (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id {primary_key_syntax},
                 user_id INTEGER,
-                topic TEXT,
-                role TEXT,
-                questions_json TEXT, -- JSON array of generated questions
-                answers_json TEXT,   -- JSON array of user responses and evaluations
+                topic VARCHAR(255),
+                role VARCHAR(255),
+                questions_json {json_type},
+                answers_json {json_type},
                 score REAL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
+                created_at TIMESTAMP DEFAULT {timestamp_syntax}
             )
         """)
         
-        logger.info("SQLite database tables created successfully.")
+        db_type_name = "Supabase PostgreSQL" if postgres_mode else "Local SQLite"
+        logger.info(f"Database schemas successfully initialized on: {db_type_name}")

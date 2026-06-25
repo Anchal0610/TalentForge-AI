@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from services.openai_service import openai_service
+from services.mistral_service import mistral_service
 from models.schemas import LearningRoadmap, CareerReadiness
 
 st.set_page_config(page_title="Roadmap & Readiness Score", page_icon="🛣️", layout="wide")
@@ -44,7 +44,7 @@ with col1:
             """
             
             try:
-                roadmap: LearningRoadmap = openai_service.generate_structured_completion(
+                roadmap: LearningRoadmap = mistral_service.generate_structured_completion(
                     prompt=prompt,
                     system_instruction="You are a professional software instructor and technical syllabus architect.",
                     response_model=LearningRoadmap
@@ -81,7 +81,7 @@ with col2:
             """
             
             try:
-                readiness: CareerReadiness = openai_service.generate_structured_completion(
+                readiness: CareerReadiness = mistral_service.generate_structured_completion(
                     prompt=prompt,
                     system_instruction="You are an expert HR quantitative analyst. Output career readiness profiles.",
                     response_model=CareerReadiness

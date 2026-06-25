@@ -15,20 +15,19 @@ from agents.readiness_agent import ReadinessAgent
 class CareerIntelligenceCrew:
     def __init__(self, use_mock: bool = False):
         self.use_mock = use_mock
-        
-        # Configure LLM using standard CrewAI options
-        # In real execution, CrewAI picks up OPENAI_API_KEY from environment.
-        # If API key is not set, we can assign a dummy or let CrewAI raise an error.
         self.llm = None
-        if not self.use_mock and os.getenv("OPENAI_API_KEY"):
+        
+        # Configure Mistral LLM for CrewAI Agents
+        if not self.use_mock and os.getenv("MISTRAL_API_KEY"):
             try:
-                from langchain_openai import ChatOpenAI
-                self.llm = ChatOpenAI(
-                    model=os.getenv("OPENAI_MODEL_NAME", "gpt-4o-mini"),
-                    api_key=os.getenv("OPENAI_API_KEY")
+                from langchain_mistralai import ChatMistralAI
+                self.llm = ChatMistralAI(
+                    model=os.getenv("MISTRAL_MODEL_NAME", "mistral-large-latest"),
+                    api_key=os.getenv("MISTRAL_API_KEY")
                 )
+                logger.info("CrewAI LLM successfully configured with Mistral AI.")
             except Exception as e:
-                logger.warning(f"Failed to initialize ChatOpenAI LLM for CrewAI: {str(e)}")
+                logger.warning(f"Failed to initialize ChatMistralAI LLM for CrewAI: {str(e)}")
 
     def run_career_analysis(self, resume_text: str, target_role: str) -> Dict[str, Any]:
         """Runs the crew tasks in sequence to perform resume, career path, and skill gap analyses."""
@@ -36,10 +35,10 @@ class CareerIntelligenceCrew:
         
         if self.use_mock or not self.llm:
             logger.info("Executing Career Crew in MOCK mode...")
-            # Simulate crew execution output matching the expected combined fields
+            # Simulate crew execution output matching expected fields
             return {
                 "resume_insights": {
-                    "ats_score": 82.0,
+                    "ats_score": 81.0,
                     "skills_extracted": ["Python", "SQL", "Flask", "Docker"],
                     "experience_summary": "Software developer with backend focus.",
                     "strengths": ["Clean code practices", "Database schemas"],
@@ -53,7 +52,7 @@ class CareerIntelligenceCrew:
                     "missing_skills": ["AWS S3/RDS", "PyTest", "CI/CD GitHub Actions"],
                     "priority_list": ["High: AWS S3", "Medium: PyTest"]
                 },
-                "readiness_score": 74.5
+                "readiness_score": 72.0
             }
 
         # 1. Initialize Agents

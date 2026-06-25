@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from services.openai_service import openai_service
+from services.mistral_service import mistral_service
 from models.schemas import SkillGapAnalysis
 
 st.set_page_config(page_title="Skill Gap Analysis", page_icon="⚖️", layout="wide")
@@ -59,7 +59,7 @@ with col2:
             system_instruction = "You are a tech assessor and skills gap specialist. Match the output structure precisely."
             
             try:
-                gap_analysis: SkillGapAnalysis = openai_service.generate_structured_completion(
+                gap_analysis: SkillGapAnalysis = mistral_service.generate_structured_completion(
                     prompt=prompt,
                     system_instruction=system_instruction,
                     response_model=SkillGapAnalysis

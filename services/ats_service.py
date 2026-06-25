@@ -1,24 +1,22 @@
 import re
 from typing import List, Dict, Any
 from utils.logger import logger
-from services.openai_service import openai_service
+from services.mistral_service import mistral_service
 from models.schemas import ResumeInsights
 
 class ATSService:
     def calculate_match_score(self, resume_text: str, job_description: str) -> Dict[str, Any]:
         """Calculates ATS similarity metrics between resume content and target job description."""
-        logger.info("Calculating ATS compatibility metrics...")
+        logger.info("Calculating ATS compatibility metrics using Mistral...")
         
         # Lowercase for simple regex scanning
         res_lower = resume_text.lower()
         jd_lower = job_description.lower()
         
-        # Simple local keyword overlap match for fallback robustness
-        # Find matches of words that are alphanumeric and length > 4 in JD
+        # Simple local keyword overlap match
         jd_words = set(re.findall(r'\b[a-zA-Z]{4,15}\b', jd_lower))
         res_words = set(re.findall(r'\b[a-zA-Z]{4,15}\b', res_lower))
         
-        # Stopwords filter
         stopwords = {
             "about", "above", "after", "again", "against", "along", "already", "also", 
             "their", "there", "these", "those", "which", "while", "would", "should", "could"
@@ -30,7 +28,7 @@ class ATSService:
         if jd_keywords:
             overlap_percentage = round((len(matched_keywords) / len(jd_keywords)) * 100, 2)
         
-        # Call OpenAI parser for smart, structured insights if key exists
+        # Call Mistral parser for structured insights
         prompt = f"""
         Analyze the candidate's resume and job description. Provide structural metrics:
         1. ATS compatibility score out of 100 (consider formatting, phrasing, and match).
@@ -51,7 +49,7 @@ class ATSService:
         system_instruction = "You are an expert HR Executive and ATS resume grading system. Provide strict JSON structure."
         
         try:
-            insights: ResumeInsights = openai_service.generate_structured_completion(
+            insights: ResumeInsights = mistral_service.generate_structured_completion(
                 prompt=prompt,
                 system_instruction=system_instruction,
                 response_model=ResumeInsights
@@ -71,8 +69,7 @@ class ATSService:
                 "overlap_percentage": overlap_percentage
             }
         except Exception as e:
-            logger.error(f"Failed structured ATS calculation: {str(e)}")
-            # Complete mock fallback
+            logger.error(f"Failed structured ATS calculation with Mistral: {str(e)}")
             return {
                 "ats_score": max(55.0, min(overlap_percentage, 95.0)),
                 "skills_extracted": ["Python", "Docker", "Database Design"],
