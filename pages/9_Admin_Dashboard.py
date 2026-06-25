@@ -40,15 +40,14 @@ with col1:
         postgres_mode = db_manager.is_postgres_active()
         db_type = "Neon PostgreSQL" if postgres_mode else "Local SQLite"
         try:
-            conn = db_manager.get_connection()
-            cursor = conn.cursor()
-            if postgres_mode:
-                cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
-                tables = [r[0] for r in cursor.fetchall()]
-            else:
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-                tables = [r[0] for r in cursor.fetchall()]
-            conn.close()
+            with db_manager.get_connection() as conn:
+                cursor = conn.cursor()
+                if postgres_mode:
+                    cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
+                    tables = [r[0] for r in cursor.fetchall()]
+                else:
+                    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+                    tables = [r[0] for r in cursor.fetchall()]
             st.success(f"✅ {db_type} Connection Healthy")
             st.info(f"Registered Schema Tables: {', '.join(tables)}")
         except Exception as e:
@@ -82,12 +81,11 @@ with col2:
     try:
         def get_count(table_name):
             try:
-                conn = db_manager.get_connection()
-                cursor = conn.cursor()
-                cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-                count = cursor.fetchone()[0]
-                conn.close()
-                return count
+                with db_manager.get_connection() as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+                    count = cursor.fetchone()[0]
+                    return count
             except Exception:
                 return 0
                 
