@@ -43,5 +43,6 @@ jobs:
     - name: Run Imports Validation Check
       run: |
         # Run our dry run import validation check script
-        python utils/logger.py
-        python database/connection.py
+        python -m utils.logger
+        python -m database.connection
+
