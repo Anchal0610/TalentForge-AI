@@ -1,7 +1,8 @@
 import networkx as nx
 import plotly.graph_objects as go
 import numpy as np
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
+
 from utils.logger import logger
 
 class CareerKnowledgeGraph:
