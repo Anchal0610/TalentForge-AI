@@ -1,7 +1,5 @@
 import streamlit as st
 import os
-from services.mistral_ocr.py import mistral_ocr_service # Wait! Let's make sure the import is correct
-# The file path is services/mistral_ocr.py, so it should be imported from services.mistral_ocr
 from services.mistral_ocr import mistral_ocr_service
 from services.ats_service import ats_service
 from utils.logger import logger
