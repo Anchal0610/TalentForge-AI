@@ -116,10 +116,9 @@ with col1:
         <div style="margin-top: 1.5rem;">
             <p style="color: #E2E8F0; font-weight: 600; margin-bottom: 0.5rem;">🚀 Available Modules:</p>
             <ul style="color: #94A3B8; line-height: 1.8; padding-left: 20px;">
-                <li><b>Resume Intelligence & ATS Analysis</b>: Check resume match rates and optimization items.</li>
+                <li><b>Resume & Document Intelligence</b>: Analyze resume compatibility, parse and index documents, run semantic RAG queries, and extract summaries.</li>
                 <li><b>Career Advisor & Recommendations</b>: Discover top titles and market growth insights.</li>
                 <li><b>Skill Gap Analysis</b>: Detailed checklist of missing libraries, tools, and algorithms.</li>
-                <li><b>Document Intelligence</b>: Summarize documents and auto-extract core exam concepts.</li>
                 <li><b>Interview Prep Suite</b>: Tiered answers (Beginner to Expert) and interactive mock evaluations.</li>
                 <li><b>3D Vector & Knowledge Graph Explorers</b>: Interact with skills mapped to job clusters.</li>
             </ul>
