@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface WeeklyPlanStep {
   week: number;
@@ -149,188 +152,196 @@ export default function RoadmapPage() {
     }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'var(--color-green)';
-    if (score >= 60) return 'var(--color-orange)';
-    return 'var(--color-red)';
+  const getScoreTextColor = (score: number) => {
+    if (score >= 80) return 'text-emerald-400';
+    if (score >= 60) return 'text-amber-400';
+    return 'text-rose-400';
+  };
+
+  const getScoreBorderColor = (score: number) => {
+    if (score >= 80) return 'border-emerald-500/30';
+    if (score >= 60) return 'border-amber-500/30';
+    return 'border-rose-500/30';
   };
 
   return (
-    <div>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🛣️ Learning Roadmaps & Career Readiness</h1>
-
-      <div className="glass-card">
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>Plan Your Skill Transition & Trace Success</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Explore your week-by-week custom syllabus complete with milestones and certifications. Monitor your Career Readiness score, structured using weighted profiles, mock transcripts, and core skills match metrics.
-        </p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">🛣️ Learning Roadmaps & Career Readiness</h1>
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+          <CardContent className="pt-6">
+            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Plan Your Skill Transition & Trace Success</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Explore your week-by-week custom syllabus complete with milestones and certifications. Monitor your Career Readiness score, structured using weighted profiles, mock transcripts, and core skills match metrics.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      {error && <div style={{ color: 'var(--color-red)', fontSize: '0.95rem', marginBottom: '20px' }}>⚠️ {error}</div>}
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '30px', alignItems: 'start' }}>
-        {/* Left Column: Weekly syllabus */}
-        <div className="glass-card" style={{ minHeight: '350px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h4 style={{ margin: 0 }}>Your Custom Weekly Learning Syllabus</h4>
-            <button
-              onClick={generateRoadmap}
-              className="btn btn-primary"
-              disabled={loadingRoadmap}
-              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-            >
-              {loadingRoadmap ? 'Assembling...' : 'Create Learning Roadmap'}
-            </button>
-          </div>
-
-          {loadingRoadmap ? (
-            <div style={{ textAlign: 'center', marginTop: '80px' }}>
-              <div className="gradient-text" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Assembling custom curriculum and projects...</div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '6px' }}>Stitching technical tutorials and certification milestones</p>
-            </div>
-          ) : roadmap ? (
-            <div>
-              <div style={{ marginBottom: '15px', color: 'var(--color-green)', fontWeight: 600, fontSize: '0.9rem' }}>
-                ✓ Target Duration: {roadmap.estimated_completion_weeks} Weeks
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {roadmap.weekly_plan.map((step) => (
-                  <div key={step.week} style={{
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    borderRadius: '8px',
-                    overflow: 'hidden'
-                  }}>
-                    <button
-                      onClick={() => setExpandedWeek(expandedWeek === step.week ? null : step.week)}
-                      style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        background: 'rgba(255,255,255,0.02)',
-                        border: 'none',
-                        padding: '12px 16px',
-                        color: 'var(--text-bright)',
-                        fontSize: '0.9rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <span>📅 WEEK {step.week}: {step.topic}</span>
-                      <span>{expandedWeek === step.week ? '▲' : '▼'}</span>
-                    </button>
-
-                    {expandedWeek === step.week && (
-                      <div style={{
-                        padding: '16px',
-                        background: 'rgba(15,23,42,0.3)',
-                        borderTop: '1px solid rgba(255,255,255,0.05)',
-                        fontSize: '0.85rem',
-                        lineHeight: '1.5',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '10px'
-                      }}>
-                        <div>
-                          <strong>Core Learning Resources:</strong>
-                          <ul style={{ paddingLeft: '20px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                            {step.resources.map((res, i) => (
-                              <li key={i}>📖 {res}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>Weekly Code Milestone:</strong>
-                          <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '2px' }}>💻 {step.project_milestone}</p>
-                        </div>
-                        {step.certification_suggestion && (
-                          <div>
-                            <strong>Recommended Certification:</strong>
-                            <span className="neon-badge badge-blue" style={{ marginLeft: '8px', marginBottom: 0 }}>{step.certification_suggestion}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', marginTop: '100px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              Click "Create Learning Roadmap" to compile a weekly study curriculum.
-            </div>
-          )}
+      {error && (
+        <div className="text-rose-400 text-sm font-medium flex items-center gap-1.5">
+          <span>⚠️</span> {error}
         </div>
+      )}
 
-        {/* Right Column: Readiness Scoring */}
-        <div className="glass-card" style={{ minHeight: '350px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h4 style={{ margin: 0 }}>Career Readiness & Analytics</h4>
-            <button
-              onClick={computeReadiness}
-              className="btn btn-primary"
-              disabled={loadingReadiness}
-              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+        {/* Left Column: Weekly syllabus */}
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-3 min-h-[350px]">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-white text-lg font-bold">Your Weekly Learning Syllabus</CardTitle>
+            <Button
+              onClick={generateRoadmap}
+              disabled={loadingRoadmap}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-9 px-4 text-xs transition-all duration-200"
             >
-              {loadingReadiness ? 'Computing...' : 'Compute Readiness Score'}
-            </button>
-          </div>
+              {loadingRoadmap ? 'Assembling...' : 'Create Roadmap'}
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {loadingRoadmap ? (
+              <div className="text-center py-20">
+                <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                  Assembling custom curriculum and projects...
+                </div>
+                <p className="text-slate-500 text-xs mt-2">
+                  Stitching technical tutorials and certification milestones
+                </p>
+              </div>
+            ) : roadmap ? (
+              <div className="space-y-4">
+                <div className="text-emerald-400 font-semibold text-xs flex items-center gap-1">
+                  <span>✓</span> Target Duration: {roadmap.estimated_completion_weeks} Weeks
+                </div>
 
-          {loadingReadiness ? (
-            <div style={{ textAlign: 'center', marginTop: '80px' }}>
-              <div className="gradient-text" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Analyzing candidate performance profiles...</div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '6px' }}>Querying DB entries and compiling capability scales</p>
-            </div>
-          ) : readiness ? (
-            <div>
-              {/* Readiness Grade badge */}
-              <div style={{
-                textAlign: 'center',
-                border: `1px solid ${getScoreColor(readiness.overall_percentage)}`,
-                background: 'rgba(15, 23, 42, 0.45)',
-                borderRadius: '16px',
-                padding: '20px',
-                marginBottom: '20px'
-              }}>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>INDEX LEVEL</div>
-                <div style={{
-                  fontSize: '3.5rem',
-                  fontWeight: 700,
-                  fontFamily: 'var(--font-title)',
-                  color: getScoreColor(readiness.overall_percentage)
-                }}>
-                  {readiness.overall_percentage}%
+                <div className="space-y-3">
+                  {roadmap.weekly_plan.map((step) => (
+                    <div
+                      key={step.week}
+                      className="border border-white/10 rounded-lg overflow-hidden bg-slate-950/20"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setExpandedWeek(expandedWeek === step.week ? null : step.week)}
+                        className="w-full text-left bg-slate-950/45 px-4 py-3 text-slate-100 font-semibold text-sm hover:bg-slate-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none"
+                      >
+                        <span>📅 WEEK {step.week}: {step.topic}</span>
+                        <span className="text-slate-500 text-xs">{expandedWeek === step.week ? '▲' : '▼'}</span>
+                      </button>
+
+                      {expandedWeek === step.week && (
+                        <div className="p-4 space-y-3.5 text-xs leading-relaxed border-t border-white/5 bg-slate-950/20">
+                          <div>
+                            <strong className="text-slate-350 block mb-1">Core Learning Resources:</strong>
+                            <ul className="space-y-1 text-slate-400 pl-1">
+                              {step.resources.map((res, i) => (
+                                <li key={i} className="flex items-center gap-1.5">
+                                  <span className="text-blue-500">•</span>
+                                  <span>{res}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <strong className="text-slate-355 block">Weekly Code Milestone:</strong>
+                            <p className="text-slate-400 italic mt-1 pl-1">💻 {step.project_milestone}</p>
+                          </div>
+                          {step.certification_suggestion && (
+                            <div className="flex items-center gap-2 pt-1">
+                              <strong className="text-slate-350">Suggested Cert:</strong>
+                              <span className="px-2 py-0.5 text-[10px] font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                                {step.certification_suggestion}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
-
-              {/* Breakdown */}
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                <strong>Assessment Weights Breakdown:</strong>
-                <div>- Resume strength weight: <code style={{ color: 'var(--text-bright)' }}>{readiness.profile_strength}%</code></div>
-                <div>- Technical skills fit weight: <code style={{ color: 'var(--text-bright)' }}>{readiness.skill_match_strength}%</code></div>
-                <div>- Mock interview proficiency weight: <code style={{ color: 'var(--text-bright)' }}>{readiness.mock_interview_strength}%</code></div>
+            ) : (
+              <div className="text-center py-24 text-slate-500 text-sm">
+                Click "Create Roadmap" to compile a weekly study curriculum.
               </div>
+            )}
+          </CardContent>
+        </Card>
 
-              {/* Next Steps */}
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '15px' }}>
-                <strong style={{ color: 'var(--text-bright)', fontSize: '0.9rem', display: 'block', marginBottom: '8px' }}>
-                  Next Immediate Steps:
-                </strong>
-                <ul style={{ paddingLeft: '20px', color: 'var(--text-muted)', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '6px', lineHeight: '1.5' }}>
-                  {readiness.next_steps.map((step, i) => (
-                    <li key={i}>📈 {step}</li>
-                  ))}
-                </ul>
+        {/* Right Column: Readiness Scoring */}
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-2 min-h-[350px]">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-white text-lg font-bold">Readiness Analytics</CardTitle>
+            <Button
+              onClick={computeReadiness}
+              disabled={loadingReadiness}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-9 px-4 text-xs transition-all duration-200"
+            >
+              {loadingReadiness ? 'Computing...' : 'Compute Score'}
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {loadingReadiness ? (
+              <div className="text-center py-20">
+                <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                  Analyzing performance profiles...
+                </div>
+                <p className="text-slate-500 text-xs mt-2">
+                  Querying database entries and compiling capability scales
+                </p>
               </div>
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', marginTop: '100px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              Click "Compute Readiness Score" to calculate candidate analytics coefficients.
-            </div>
-          )}
-        </div>
+            ) : readiness ? (
+              <div className="space-y-6">
+                {/* Readiness Grade badge */}
+                <div className={cn(
+                  "text-center border rounded-xl p-6 bg-slate-950/40 backdrop-blur-sm",
+                  getScoreBorderColor(readiness.overall_percentage)
+                )}>
+                  <div className="text-slate-400 text-xs tracking-widest uppercase font-semibold">INDEX LEVEL</div>
+                  <div className={cn(
+                    "text-5xl font-extrabold mt-2 font-mono",
+                    getScoreTextColor(readiness.overall_percentage)
+                  )}>
+                    {readiness.overall_percentage}%
+                  </div>
+                </div>
+
+                {/* Breakdown */}
+                <div className="text-xs space-y-2 border-t border-white/10 pt-4">
+                  <strong className="text-slate-200 block mb-1">Assessment Weights Breakdown:</strong>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Resume strength weight:</span>
+                    <code className="text-slate-200 font-semibold">{readiness.profile_strength}%</code>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Technical skills fit weight:</span>
+                    <code className="text-slate-200 font-semibold">{readiness.skill_match_strength}%</code>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Mock interview proficiency weight:</span>
+                    <code className="text-slate-200 font-semibold">{readiness.mock_interview_strength}%</code>
+                  </div>
+                </div>
+
+                {/* Next Steps */}
+                <div className="border-t border-white/10 pt-4">
+                  <h5 className="text-sm font-semibold text-slate-200 mb-2.5">Next Immediate Steps:</h5>
+                  <ul className="space-y-2 text-slate-400 text-xs pl-1">
+                    {readiness.next_steps.map((step, i) => (
+                      <li key={i} className="flex items-start gap-2.5">
+                        <span className="text-emerald-500 font-bold">✓</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-24 text-slate-500 text-sm">
+                Click "Compute Score" to calculate candidate analytics coefficients.
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

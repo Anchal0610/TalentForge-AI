@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface DiagnosticResult {
   db: {
@@ -64,119 +67,153 @@ export default function AdminPage() {
   };
 
   return (
-    <div>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>⚙️ System Administration & Diagnostics</h1>
-
-      <div className="glass-card">
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>Engine Integrity Control Center</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Run live checks on vector storage indexes, relational schema tables, and API connectivity modules. Monitor active service models and review system log parameters.
-        </p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">⚙️ System Administration & Diagnostics</h1>
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+          <CardContent className="pt-6">
+            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Engine Integrity Control Center</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Run live checks on vector storage indexes, relational schema tables, and API connectivity modules. Monitor active service models and review system log parameters.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', alignItems: 'start' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Left Column: Diagnostics Trigger */}
-        <div className="glass-card">
-          <h4 style={{ marginBottom: '16px' }}>Platform Connections Health Check</h4>
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle className="text-white text-lg font-bold">Platform Connections Health Check</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <Button
+              onClick={runDiagnostics}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+            >
+              {loading ? '🔮 Executing Diagnostics...' : '⚙️ Execute Diagnostic Suite Check'}
+            </Button>
 
-          <button
-            onClick={runDiagnostics}
-            className="btn btn-primary"
-            disabled={loading}
-            style={{ width: '100%', marginBottom: '20px' }}
-          >
-            {loading ? '🔮 Executing Diagnostics...' : '⚙️ Execute Diagnostic Suite Check'}
-          </button>
-
-          {error && <div style={{ color: 'var(--color-red)', fontSize: '0.9rem', marginBottom: '15px' }}>⚠️ {error}</div>}
-
-          {results && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '0.9rem' }}>
-              {/* DB Status */}
-              <div>
-                {results.db.dbHealthy ? (
-                  <div style={{ color: 'var(--color-green)', fontWeight: 'bold' }}>✅ DB Connection Healthy ({results.db.databaseType})</div>
-                ) : (
-                  <div style={{ color: 'var(--color-red)', fontWeight: 'bold' }}>❌ DB Connection Error</div>
-                )}
+            {error && (
+              <div className="text-rose-400 text-sm font-medium flex items-center gap-1.5">
+                <span>⚠️</span> {error}
               </div>
+            )}
 
-              {/* Pinecone Status */}
-              <div>
-                {results.pinecone.enabled ? (
-                  <div>
-                    <span style={{ color: 'var(--color-green)', fontWeight: 'bold' }}>✅ Pinecone Vector Active</span>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Index: {results.pinecone.indexName} ({results.pinecone.status})<br />
-                      Active Indexes: {results.pinecone.activeIndexes.join(', ') || 'None'}
+            {results && (
+              <div className="space-y-4 pt-2 text-sm leading-relaxed">
+                {/* DB Status */}
+                <div className="p-3 bg-slate-950/40 border border-white/5 rounded-lg">
+                  {results.db.dbHealthy ? (
+                    <div className="text-emerald-400 font-semibold flex items-center gap-2">
+                      <span>✅</span> DB Connection Healthy ({results.db.databaseType})
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    <span style={{ color: 'var(--color-orange)', fontWeight: 'bold' }}>⚠️ Pinecone Vector Client in Fallback</span>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Status: {results.pinecone.status}<br />
-                      Index: {results.pinecone.indexName}
+                  ) : (
+                    <div className="text-rose-400 font-semibold flex items-center gap-2">
+                      <span>❌</span> DB Connection Error
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Mistral Status */}
-              <div>
-                {results.mistral.configured ? (
-                  <div>
-                    <span style={{ color: 'var(--color-green)', fontWeight: 'bold' }}>✅ Mistral AI Client Validated</span>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Model Name: {results.mistral.modelName}
+                {/* Pinecone Status */}
+                <div className="p-3 bg-slate-950/40 border border-white/5 rounded-lg">
+                  {results.pinecone.enabled ? (
+                    <div className="space-y-1">
+                      <div className="text-emerald-400 font-semibold flex items-center gap-2">
+                        <span>✅</span> Pinecone Vector Active
+                      </div>
+                      <div className="text-xs text-slate-400 pl-6 leading-relaxed">
+                        Index: {results.pinecone.indexName} ({results.pinecone.status})<br />
+                        Active Indexes: {results.pinecone.activeIndexes.join(', ') || 'None'}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div>
-                    <span style={{ color: 'var(--color-orange)', fontWeight: 'bold' }}>⚠️ Mistral AI Client in Fallback</span>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Operating in mock fallback mode (Credentials not configured)
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="text-amber-400 font-semibold flex items-center gap-2">
+                        <span>⚠️</span> Pinecone Vector Client in Fallback
+                      </div>
+                      <div className="text-xs text-slate-450 pl-6 leading-relaxed">
+                        Status: {results.pinecone.status}<br />
+                        Index: {results.pinecone.indexName}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+
+                {/* Mistral Status */}
+                <div className="p-3 bg-slate-950/40 border border-white/5 rounded-lg">
+                  {results.mistral.configured ? (
+                    <div className="space-y-1">
+                      <div className="text-emerald-400 font-semibold flex items-center gap-2">
+                        <span>✅</span> Mistral AI Client Validated
+                      </div>
+                      <div className="text-xs text-slate-400 pl-6">
+                        Model Name: {results.mistral.modelName}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="text-amber-400 font-semibold flex items-center gap-2">
+                        <span>⚠️</span> Mistral AI Client in Fallback
+                      </div>
+                      <div className="text-xs text-slate-455 pl-6 leading-relaxed">
+                        Operating in mock fallback mode (Credentials not configured)
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Right Column: Database Stats & System Logs */}
-        <div className="glass-card">
-          <h4 style={{ marginBottom: '16px' }}>Database Schema Metrics</h4>
-          {results ? (
-            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '25px' }}>
-              <div>- Total Registered Users: <code style={{ color: 'var(--text-bright)' }}>{results.db.usersCount}</code></div>
-              <div>- Total Resumes Parsed: <code style={{ color: 'var(--text-bright)' }}>{results.db.resumesCount}</code></div>
-              <div>- RAG Documents Ingested: <code style={{ color: 'var(--text-bright)' }}>{results.db.documentsCount}</code></div>
-              <div>- Mock Interview Submissions: <code style={{ color: 'var(--text-bright)' }}>{results.db.mockInterviewsCount}</code></div>
-            </div>
-          ) : (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '25px' }}>
-              Trigger diagnostics check to retrieve table log sizes.
-            </p>
-          )}
+        <div className="space-y-6">
+          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md">
+            <CardHeader>
+              <CardTitle className="text-white text-lg font-bold">Database Schema Metrics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {results ? (
+                <div className="text-xs text-slate-400 space-y-2.5">
+                  <div className="flex justify-between border-b border-white/5 pb-2">
+                    <span>Total Registered Users:</span>
+                    <code className="text-slate-100 font-semibold font-mono">{results.db.usersCount}</code>
+                  </div>
+                  <div className="flex justify-between border-b border-white/5 pb-2">
+                    <span>Total Resumes Parsed:</span>
+                    <code className="text-slate-100 font-semibold font-mono">{results.db.resumesCount}</code>
+                  </div>
+                  <div className="flex justify-between border-b border-white/5 pb-2">
+                    <span>RAG Documents Ingested:</span>
+                    <code className="text-slate-100 font-semibold font-mono">{results.db.documentsCount}</code>
+                  </div>
+                  <div className="flex justify-between pb-1">
+                    <span>Mock Interview Submissions:</span>
+                    <code className="text-slate-100 font-semibold font-mono">{results.db.mockInterviewsCount}</code>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-slate-500 text-xs py-4">
+                  Trigger diagnostics check to retrieve table log sizes.
+                </p>
+              )}
+            </CardContent>
+          </Card>
 
-          <h4 style={{ marginBottom: '12px' }}>Recent System Log Traces</h4>
-          <textarea
-            readOnly
-            value={logs.join('\n')}
-            style={{
-              height: '180px',
-              fontFamily: 'monospace',
-              fontSize: '0.75rem',
-              color: 'var(--text-muted)',
-              background: 'rgba(15, 23, 42, 0.8)',
-              border: '1px solid var(--glass-border)',
-              padding: '12px',
-              borderRadius: '8px',
-              width: '100%',
-              resize: 'none'
-            }}
-          />
+          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md">
+            <CardHeader>
+              <CardTitle className="text-white text-base font-semibold">Recent System Log Traces</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <textarea
+                readOnly
+                value={logs.join('\n')}
+                className="h-[180px] font-mono text-[10px] leading-normal text-slate-400 bg-slate-950/80 border border-white/10 p-3 rounded-lg w-full resize-none focus:outline-none focus:border-white/10 overflow-y-auto scrollbar-thin"
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

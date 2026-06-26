@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -47,47 +48,26 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside style={{
-      width: 'var(--sidebar-width)',
-      height: '100vh',
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      background: 'rgba(10, 15, 30, 0.75)',
-      borderRight: '1px solid var(--glass-border)',
-      backdropFilter: 'var(--glass-blur)',
-      WebkitBackdropFilter: 'var(--glass-blur)',
-      padding: '30px 20px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      zIndex: 100
-    }}>
+    <aside className="w-[260px] h-screen fixed left-0 top-0 bg-[#0a0f1e]/75 border-r border-white/10 backdrop-blur-md p-6 flex flex-col justify-between z-50">
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '30px' }}>
-          <span style={{ fontSize: '1.5rem' }}>⚡</span>
-          <h3 style={{ fontFamily: 'var(--font-title)', fontWeight: 700, letterSpacing: '0.05em' }}>NEXORA AI</h3>
+        <div className="flex items-center gap-2 mb-8">
+          <span className="text-2xl">⚡</span>
+          <h3 className="font-bold tracking-wider text-lg text-white">NEXORA AI</h3>
         </div>
         
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <nav className="flex flex-col gap-1.5">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                style={{
-                  padding: '10px 16px',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  color: isActive ? 'var(--text-bright)' : 'var(--text-muted)',
-                  background: isActive ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
-                  border: isActive ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid transparent',
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: '0.9rem',
-                  transition: 'all 0.2s ease-in-out',
-                  display: 'block'
-                }}
+                className={cn(
+                  "block px-4 py-2 rounded-lg text-sm transition-all duration-200",
+                  isActive
+                    ? "text-white bg-white/5 border border-white/10 font-semibold shadow-[0_0_15px_rgba(139,92,246,0.1)]"
+                    : "text-slate-400 hover:text-white hover:bg-white/5 border border-transparent font-medium"
+                )}
               >
                 {link.label}
               </Link>
@@ -96,13 +76,9 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <div style={{
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        paddingTop: '20px',
-        marginTop: '20px'
-      }}>
-        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>ACTIVE PROFILE</div>
-        <div style={{ fontWeight: 'bold', fontSize: '0.9rem', color: 'var(--text-bright)', marginBottom: '12px' }}>
+      <div className="border-t border-white/10 pt-5 mt-5">
+        <div className="text-[10px] tracking-wider text-slate-400 mb-1.5 uppercase">ACTIVE PROFILE</div>
+        <div className="font-bold text-sm text-white mb-3">
           👤 {name}
         </div>
         <input
@@ -110,14 +86,9 @@ export default function Sidebar() {
           placeholder="Associate Email"
           value={email}
           onChange={handleEmailChange}
-          style={{
-            fontSize: '0.8rem',
-            padding: '8px 12px',
-            marginBottom: 0,
-            background: 'rgba(15, 23, 42, 0.8)'
-          }}
+          className="text-xs px-3 py-2 bg-slate-900/80 border border-white/10 rounded-md text-white placeholder-slate-500 w-full focus:outline-none focus:border-violet-500 transition-colors"
         />
-        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '6px', textAlign: 'center' }}>
+        <div className="text-[10px] text-slate-500 mt-2 text-center">
           Saves parsed metrics to DB
         </div>
       </div>

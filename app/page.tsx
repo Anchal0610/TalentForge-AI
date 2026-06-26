@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
 export default function HomePage() {
   const [readiness, setReadiness] = useState(74.5);
@@ -22,102 +23,156 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div>
+    <div className="space-y-10">
       {/* App Header */}
-      <header style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '3.5rem', marginBottom: '0.2rem' }} className="gradient-text">
+      <header className="text-center mt-8 mb-12">
+        <h1 className="text-5xl font-extrabold mb-3 tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
           Nexora AI
         </h1>
-        <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', fontWeight: 300, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+        <p className="text-base text-slate-400 font-light tracking-widest uppercase">
           Analyze. Learn. Upgrade. Get Interview Ready.
         </p>
       </header>
 
       {/* Main Dashboard Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Platform Intro */}
-        <div>
-          <div className="glass-card">
-            <div className="neon-badge badge-blue">Platform Overview</div>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>Welcome to the Next-Gen Career Ecosystem</h3>
-            <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '20px' }}>
-              Nexora AI leverages advanced multi-agent systems, deep RAG pipelines, and high-dimensional vector embeddings to construct a hyper-personalized roadmap tailored for your engineering journey. Scan your resume, explore target requirements, learn from intelligent summaries, practice mock sessions, and visualize your skillset in 3D.
-            </p>
-            
-            <div style={{ marginTop: '1.5rem' }}>
-              <p style={{ color: 'var(--text-bright)', fontWeight: 600, marginBottom: '12px' }}>🚀 Available Modules:</p>
-              <ul style={{ color: 'var(--text-muted)', lineHeight: 1.8, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <li><b>Resume Intelligence & ATS Analysis</b>: Check resume match rates and optimization items.</li>
-                <li><b>Career Advisor & Recommendations</b>: Discover top titles and market growth insights.</li>
-                <li><b>Skill Gap Analysis</b>: Detailed checklist of missing libraries, tools, and algorithms.</li>
-                <li><b>Document Intelligence</b>: Summarize documents and auto-extract core exam concepts.</li>
-                <li><b>Interview Prep Suite</b>: Tiered answers (Beginner to Expert) and interactive mock evaluations.</li>
-                <li><b>3D Vector & Knowledge Graph Explorers</b>: Interact with skills mapped to job clusters.</li>
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-indigo-500/40 hover:shadow-[0_8px_32px_rgba(99,102,241,0.15)] transition-all duration-300">
+            <CardHeader className="pb-3">
+              <div className="inline-block px-3 py-1 text-[10px] font-semibold tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-full w-fit uppercase mb-2">
+                Platform Overview
+              </div>
+              <CardTitle className="text-2xl font-bold text-white">Welcome to the Next-Gen Career Ecosystem</CardTitle>
+              <CardDescription className="text-slate-400 text-sm leading-relaxed mt-2">
+                Nexora AI leverages advanced multi-agent systems, deep RAG pipelines, and high-dimensional vector embeddings to construct a hyper-personalized roadmap tailored for your engineering journey. Scan your resume, explore target requirements, learn from intelligent summaries, practice mock sessions, and visualize your skillset in 3D.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="mt-4 space-y-4">
+              <p className="text-slate-200 font-semibold flex items-center gap-2">
+                <span>🚀</span> Available Modules:
+              </p>
+              <ul className="text-slate-400 text-sm leading-relaxed space-y-3 pl-1">
+                <li className="flex items-start gap-2.5">
+                  <span className="text-blue-500 mt-1">✓</span>
+                  <div>
+                    <strong className="text-slate-200">Resume Intelligence & ATS Analysis</strong>: Check resume match rates and retrieve targeted optimization feedback.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-purple-500 mt-1">✓</span>
+                  <div>
+                    <strong className="text-slate-200">Career Advisor & Recommendations</strong>: Discover high-growth roles and real-time market insights.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-pink-500 mt-1">✓</span>
+                  <div>
+                    <strong className="text-slate-200">Skill Gap Analysis</strong>: Maintain a precise checklist of missing libraries, tools, and system architectures.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-emerald-500 mt-1">✓</span>
+                  <div>
+                    <strong className="text-slate-200">Document Intelligence</strong>: Parse PDF documents to auto-generate structured learning concepts and exams.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-orange-500 mt-1">✓</span>
+                  <div>
+                    <strong className="text-slate-200">Interview Prep Suite</strong>: Practice with tier-specific responses (Beginner to Expert) and interactive grading feedback.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-amber-500 mt-1">✓</span>
+                  <div>
+                    <strong className="text-slate-200">3D Vector & Knowledge Graph Explorers</strong>: Discover semantic correlations in your skillset using immersive visual graphs.
+                  </div>
+                </li>
               </ul>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
           {/* Quick Actions */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <Link href="/resume" className="glass-card" style={{ textDecoration: 'none', display: 'block', padding: '20px' }}>
-              <h4 style={{ color: 'var(--color-blue)', marginBottom: '6px' }}>📄 Optimize Resume</h4>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Scan compatibility indices and retrieve custom corrections.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Link href="/resume" className="group">
+              <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md group-hover:border-blue-500/40 group-hover:shadow-[0_8px_32px_rgba(59,130,246,0.15)] transition-all duration-300 h-full">
+                <CardHeader>
+                  <CardTitle className="text-blue-400 group-hover:text-blue-300 transition-colors flex items-center gap-2">
+                    <span>📄</span> Optimize Resume
+                  </CardTitle>
+                  <CardDescription className="text-slate-400 text-sm mt-1">
+                    Scan compatibility indices and retrieve custom corrections instantly.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
             </Link>
-            <Link href="/roadmap" className="glass-card" style={{ textDecoration: 'none', display: 'block', padding: '20px' }}>
-              <h4 style={{ color: 'var(--color-magenta)', marginBottom: '6px' }}>🗺️ Weekly Syllabus</h4>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Explore week-by-week study milestones and credentials.</p>
+            <Link href="/roadmap" className="group">
+              <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md group-hover:border-purple-500/40 group-hover:shadow-[0_8px_32px_rgba(139,92,246,0.15)] transition-all duration-300 h-full">
+                <CardHeader>
+                  <CardTitle className="text-purple-400 group-hover:text-purple-300 transition-colors flex items-center gap-2">
+                    <span>🗺️</span> Weekly Syllabus
+                  </CardTitle>
+                  <CardDescription className="text-slate-400 text-sm mt-1">
+                    Explore week-by-week study milestones, targets, and credentials.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
             </Link>
           </div>
         </div>
 
         {/* Right Column: Profile Analytics */}
-        <div>
-          <div className="glass-card" style={{ textAlign: 'center' }}>
-            <div className="neon-badge badge-green">Candidate Health</div>
-            <h4 style={{ fontSize: '1.25rem', marginBottom: '15px' }}>Active Profile</h4>
-            
-            <div style={{ margin: '1.5rem 0' }}>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', letterSpacing: '0.05em' }}>OVERALL READINESS</div>
-              <div className="metric-value" style={{ color: 'var(--color-green)' }}>
-                {readiness.toFixed(1)}%
+        <div className="space-y-6">
+          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-emerald-500/40 hover:shadow-[0_8px_32px_rgba(16,185,129,0.15)] transition-all duration-300 text-center">
+            <CardHeader className="items-center pb-2">
+              <div className="inline-block px-3 py-1 text-[10px] font-semibold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full w-fit uppercase mb-2">
+                Candidate Health
               </div>
-            </div>
+              <CardTitle className="text-lg font-bold text-white">Active Profile</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="py-2">
+                <div className="text-slate-400 text-xs tracking-widest uppercase">OVERALL READINESS</div>
+                <div className="text-5xl font-extrabold text-emerald-400 mt-2 font-mono">
+                  {readiness.toFixed(1)}%
+                </div>
+              </div>
 
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>ATS Score:</span>
-                <span style={{ color: 'var(--color-blue)', fontWeight: 600 }}>{atsScore.toFixed(1)}%</span>
+              <div className="border-t border-white/10 pt-5 space-y-3.5 text-left">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">ATS Score:</span>
+                  <span className="text-blue-400 font-semibold font-mono">{atsScore.toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Skill Match Fit:</span>
+                  <span className="text-purple-400 font-semibold font-mono">{(100 - gapPercentage).toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Mock Interview:</span>
+                  <span className="text-orange-400 font-semibold">Completed</span>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Skill Match Fit:</span>
-                <span style={{ color: 'var(--color-purple)', fontWeight: 600 }}>{(100 - gapPercentage).toFixed(1)}%</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Mock Interview:</span>
-                <span style={{ color: 'var(--color-orange)', fontWeight: 600 }}>Completed</span>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="glass-card">
-            <h4 style={{ marginBottom: '12px', fontSize: '1rem' }}>📈 MLOps Proximity Insights</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-              Your high-dimensional capability vector indicates close proximity to standard backend patterns, with gaps remaining in distributed container orchestration scheduling.
-            </p>
-          </div>
+          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-blue-500/40 hover:shadow-[0_8px_32px_rgba(59,130,246,0.15)] transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                <span>📈</span> MLOps Proximity Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                Your high-dimensional capability vector indicates close proximity to standard backend patterns, with gaps remaining in distributed container orchestration scheduling.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       {/* Footer */}
-      <footer style={{
-        textAlign: 'center',
-        marginTop: '5rem',
-        paddingBottom: '2rem',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        paddingTop: '1.5rem',
-        fontSize: '0.8rem',
-        color: 'var(--text-muted)'
-      }}>
+      <footer className="text-center mt-20 pt-6 pb-8 border-t border-white/5 text-xs text-slate-500">
         Nexora AI &copy; 2026. Made with &hearts; for Hackathon Excellence.
       </footer>
     </div>

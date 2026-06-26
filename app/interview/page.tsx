@@ -1,6 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface QuestionGuide {
   question: string;
@@ -164,285 +169,286 @@ export default function InterviewPage() {
   };
 
   return (
-    <div>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🎤 AI Interview Preparation Suite</h1>
-
-      <div className="glass-card">
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>Prepare for Live Assessments</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Generate target-focused questions, study multi-tiered responses (Beginner, Intermediate, Expert), and simulate an interactive mock evaluation. The engine analyzes your answer's keywords and coverage, suggesting key improvement steps.
-        </p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">🎤 AI Interview Preparation Suite</h1>
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+          <CardContent className="pt-6">
+            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Prepare for Live Assessments</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Generate target-focused questions, study multi-tiered responses (Beginner, Intermediate, Expert), and simulate an interactive mock evaluation. The engine analyzes your answer's keywords and coverage, suggesting key improvement steps.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Tabs Menu */}
-      <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+      <div className="flex gap-4 border-b border-white/10 pb-px">
         <button
           onClick={() => setActiveTab('guide')}
-          style={{
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'guide' ? '2px solid var(--color-purple)' : '2px solid transparent',
-            color: activeTab === 'guide' ? 'var(--text-bright)' : 'var(--text-muted)',
-            padding: '10px 15px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
+          className={cn(
+            "px-4 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 outline-none",
+            activeTab === 'guide'
+              ? "border-purple-500 text-white"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          )}
         >
           📚 Question & Answer Bank
         </button>
         <button
           onClick={() => setActiveTab('mock')}
-          style={{
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'mock' ? '2px solid var(--color-purple)' : '2px solid transparent',
-            color: activeTab === 'mock' ? 'var(--text-bright)' : 'var(--text-muted)',
-            padding: '10px 15px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
+          className={cn(
+            "px-4 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 outline-none",
+            activeTab === 'mock'
+              ? "border-purple-500 text-white"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          )}
         >
           🤖 Mock Interview Sim
         </button>
       </div>
 
       {activeTab === 'guide' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '30px', alignItems: 'start' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
           {/* Q&A Parameters Form */}
-          <form onSubmit={generateGuide} className="glass-card">
-            <h4 style={{ marginBottom: '16px' }}>Generate Study Guides</h4>
+          <form onSubmit={generateGuide} className="lg:col-span-2">
+            <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-violet-500/20 transition-colors">
+              <CardHeader>
+                <CardTitle className="text-white text-lg font-bold">Generate Study Guides</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                    Difficulty Level
+                  </label>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value)}
+                    className="w-full h-10 px-3 bg-slate-950/40 border border-white/10 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500 transition-colors"
+                  >
+                    <option value="All Levels" className="bg-[#050811] text-slate-200">All Levels</option>
+                    <option value="Easy" className="bg-[#050811] text-slate-200">Easy</option>
+                    <option value="Medium" className="bg-[#050811] text-slate-200">Medium</option>
+                    <option value="Hard" className="bg-[#050811] text-slate-200">Hard</option>
+                  </select>
+                </div>
 
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
-              DIFFICULTY LEVEL
-            </label>
-            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-              <option value="All Levels">All Levels</option>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                    Question Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full h-10 px-3 bg-slate-950/40 border border-white/10 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500 transition-colors"
+                  >
+                    <option value="Technical" className="bg-[#050811] text-slate-200">Technical</option>
+                    <option value="HR / Behavioral" className="bg-[#050811] text-slate-200">HR / Behavioral</option>
+                    <option value="System Design" className="bg-[#050811] text-slate-200">System Design</option>
+                  </select>
+                </div>
 
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
-              QUESTION CATEGORY
-            </label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="Technical">Technical</option>
-              <option value="HR / Behavioral">HR / Behavioral</option>
-              <option value="System Design">System Design</option>
-            </select>
-
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loadingGuide}
-              style={{ width: '100%' }}
-            >
-              {loadingGuide ? '🔮 Compiling guide...' : '🚀 Generate Q&A Guide'}
-            </button>
+                <Button
+                  type="submit"
+                  disabled={loadingGuide}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                >
+                  {loadingGuide ? '🔮 Compiling guide...' : '🚀 Generate Q&A Guide'}
+                </Button>
+              </CardContent>
+            </Card>
           </form>
 
           {/* Guide list output */}
-          <div className="glass-card" style={{ minHeight: '350px' }}>
-            <h4 style={{ marginBottom: '16px' }}>Study Guide Questions</h4>
-
-            {loadingGuide ? (
-              <div style={{ textAlign: 'center', marginTop: '80px' }}>
-                <div className="gradient-text" style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Compiling technical interview checklist...</div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '8px' }}>Structuring answers for three experience tiers</p>
-              </div>
-            ) : guideQuestions.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                {guideQuestions.map((q, idx) => (
-                  <div key={idx} style={{
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '8px',
-                    overflow: 'hidden'
-                  }}>
-                    <button
-                      onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
-                      style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        background: 'rgba(255,255,255,0.02)',
-                        border: 'none',
-                        padding: '14px 18px',
-                        color: 'var(--text-bright)',
-                        fontSize: '0.95rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <span>Question {idx + 1}: {q.question}</span>
-                      <span>{expandedIndex === idx ? '▲' : '▼'}</span>
-                    </button>
-
-                    {expandedIndex === idx && (
-                      <div style={{
-                        padding: '18px',
-                        background: 'rgba(15, 23, 42, 0.3)',
-                        borderTop: '1px solid rgba(255,255,255,0.06)',
-                        fontSize: '0.85rem',
-                        lineHeight: '1.6',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '12px'
-                      }}>
-                        <div>
-                          <strong>Category:</strong> <span className="neon-badge badge-blue" style={{ marginBottom: 0 }}>{q.category}</span>
-                        </div>
-                        <div>
-                          <span style={{ color: 'var(--color-green)', fontWeight: 'bold' }}>🟢 Beginner Response:</span>
-                          <p style={{ color: 'var(--text-muted)' }}>{q.beginner_answer}</p>
-                        </div>
-                        <div>
-                          <span style={{ color: 'var(--color-orange)', fontWeight: 'bold' }}>🟡 Intermediate Response:</span>
-                          <p style={{ color: 'var(--text-muted)' }}>{q.intermediate_answer}</p>
-                        </div>
-                        <div>
-                          <span style={{ color: 'var(--color-red)', fontWeight: 'bold' }}>🔴 Expert Response:</span>
-                          <p style={{ color: 'var(--text-muted)' }}>{q.expert_answer}</p>
-                        </div>
-                      </div>
-                    )}
+          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-3 min-h-[350px]">
+            <CardHeader>
+              <CardTitle className="text-white text-lg font-bold">Study Guide Questions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loadingGuide ? (
+                <div className="text-center py-20">
+                  <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                    Compiling technical interview checklist...
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', marginTop: '100px', color: 'var(--text-muted)' }}>
-                Click "Generate Q&A Guide" to compile custom target Q&A guide cards.
-              </div>
-            )}
-          </div>
+                  <p className="text-slate-500 text-xs mt-2">
+                    Structuring answers for three experience tiers
+                  </p>
+                </div>
+              ) : guideQuestions.length > 0 ? (
+                <div className="space-y-4">
+                  {guideQuestions.map((q, idx) => (
+                    <div
+                      key={idx}
+                      className="border border-white/10 rounded-lg overflow-hidden bg-slate-950/20"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
+                        className="w-full text-left bg-slate-950/40 px-4 py-3 text-slate-100 font-semibold text-sm hover:bg-slate-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none"
+                      >
+                        <span>Question {idx + 1}: {q.question}</span>
+                        <span className="text-slate-500 text-xs">{expandedIndex === idx ? '▲' : '▼'}</span>
+                      </button>
+
+                      {expandedIndex === idx && (
+                        <div className="p-4 space-y-4 text-xs leading-relaxed border-t border-white/5 bg-slate-950/20">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-300">Category:</span>
+                            <span className="px-2 py-0.5 text-[10px] font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                              {q.category}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-emerald-400 font-bold flex items-center gap-1 mb-1">
+                              <span>🟢</span> Beginner Response
+                            </span>
+                            <p className="text-slate-400 bg-slate-950/40 p-2.5 rounded border border-white/5">{q.beginner_answer}</p>
+                          </div>
+                          <div>
+                            <span className="text-amber-400 font-bold flex items-center gap-1 mb-1">
+                              <span>🟡</span> Intermediate Response
+                            </span>
+                            <p className="text-slate-400 bg-slate-950/40 p-2.5 rounded border border-white/5">{q.intermediate_answer}</p>
+                          </div>
+                          <div>
+                            <span className="text-rose-400 font-bold flex items-center gap-1 mb-1">
+                              <span>🔴</span> Expert Response
+                            </span>
+                            <p className="text-slate-400 bg-slate-950/40 p-2.5 rounded border border-white/5">{q.expert_answer}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-24 text-slate-500 text-sm">
+                  Click "Generate Q&A Guide" to compile custom target Q&A guide cards.
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       ) : (
         /* Tab 2: Mock simulator */
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div className="max-w-3xl mx-auto">
           {mockIndex < mockQuestions.length ? (
-            <div className="glass-card" style={{ borderLeft: '5px solid var(--color-purple)' }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                MOCK QUESTION {mockIndex + 1} OF {mockQuestions.length}
-              </div>
-              <h4 style={{ fontSize: '1.2rem', color: 'var(--text-bright)', marginBottom: '20px' }}>
-                {mockQuestions[mockIndex]}
-              </h4>
+            <Card className="border border-white/10 border-l-4 border-l-purple-500 bg-slate-900/40 backdrop-blur-md">
+              <CardHeader className="pb-3">
+                <div className="text-[10px] tracking-wider text-slate-400 mb-1.5 uppercase font-semibold">
+                  Mock Question {mockIndex + 1} of {mockQuestions.length}
+                </div>
+                <CardTitle className="text-xl text-white font-bold">{mockQuestions[mockIndex]}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <form onSubmit={submitAnswer} className="space-y-4">
+                  <Textarea
+                    placeholder="Type your explanation here..."
+                    value={userAnswer}
+                    onChange={(e) => setUserAnswer(e.target.value)}
+                    className="bg-slate-950/40 border-white/10 text-white min-h-[160px] focus-visible:border-violet-500/50"
+                    disabled={loadingEval || !!currentEval}
+                  />
 
-              <form onSubmit={submitAnswer}>
-                <textarea
-                  placeholder="Type your explanation here..."
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  style={{ height: '140px' }}
-                  disabled={loadingEval || !!currentEval}
-                />
+                  {!currentEval ? (
+                    <Button
+                      type="submit"
+                      disabled={loadingEval || !userAnswer}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                    >
+                      {loadingEval ? '🔮 Evaluating Response...' : 'Submit Answer'}
+                    </Button>
+                  ) : (
+                    <div className="flex gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={restartMock}
+                        className="flex-1 text-slate-200 border-white/10 hover:bg-white/5 h-10"
+                      >
+                        Restart Session
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={nextQuestion}
+                        className="flex-[1.5] bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10"
+                      >
+                        Next Question
+                      </Button>
+                    </div>
+                  )}
+                </form>
 
-                {!currentEval ? (
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={loadingEval || !userAnswer}
-                    style={{ width: '100%' }}
-                  >
-                    {loadingEval ? '🔮 Evaluating Response...' : 'Submit Answer'}
-                  </button>
-                ) : (
-                  <div style={{ display: 'flex', gap: '15px' }}>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={restartMock}
-                      style={{ flex: 1 }}
-                    >
-                      Restart Session
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={nextQuestion}
-                      style={{ flex: 1.5 }}
-                    >
-                      Next Question
-                    </button>
+                {currentEval && (
+                  <div className="border-t border-white/10 pt-5 space-y-4">
+                    <div className="text-sm font-semibold text-slate-200 flex items-center gap-1.5">
+                      <span>Grade Score:</span>
+                      <span className="text-emerald-400 font-mono text-lg font-bold">{currentEval.score}/100</span>
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-semibold text-slate-300 mb-2">Missing Keywords:</h5>
+                      <div className="flex flex-wrap gap-2">
+                        {currentEval.missing_keywords.map((term, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-0.5 text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-full"
+                          >
+                            {term}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-semibold text-slate-300 mb-1">Suggestions:</h5>
+                      <p className="text-slate-450 text-xs leading-relaxed bg-slate-950/40 p-3 rounded-lg border border-white/5">
+                        {currentEval.improvements}
+                      </p>
+                    </div>
                   </div>
                 )}
-              </form>
-
-              {currentEval && (
-                <div style={{
-                  marginTop: '25px',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                  paddingTop: '20px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px'
-                }}>
-                  <div style={{ fontSize: '1.1rem' }}>
-                    Grade Score: <strong style={{ color: 'var(--color-green)' }}>{currentEval.score}/100</strong>
-                  </div>
-                  <div>
-                    <strong style={{ color: 'var(--text-bright)', fontSize: '0.9rem' }}>Missing Keywords:</strong>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-                      {currentEval.missing_keywords.map((term, i) => (
-                        <span key={i} className="neon-badge badge-orange" style={{ marginBottom: 0 }}>{term}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <strong style={{ color: 'var(--text-bright)', fontSize: '0.9rem' }}>Suggestions:</strong>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '4px', lineHeight: '1.5' }}>
-                      {currentEval.improvements}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+              </CardContent>
+            </Card>
           ) : (
             /* Mock Recap */
-            <div className="glass-card" style={{ textAlign: 'center' }}>
-              <div className="neon-badge badge-green">Recap</div>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Mock Interview Completed!</h3>
+            <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md text-center">
+              <CardHeader className="items-center pb-2">
+                <div className="inline-block px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full uppercase mb-2">
+                  Recap
+                </div>
+                <CardTitle className="text-2xl font-bold text-white">Mock Interview Completed!</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="text-6xl font-extrabold text-emerald-400 font-mono py-4">
+                  {getAvgScore()}%
+                </div>
 
-              <div style={{
-                fontSize: '3.5rem',
-                fontWeight: 700,
-                color: 'var(--color-green)',
-                fontFamily: 'var(--font-title)',
-                marginBottom: '30px'
-              }}>
-                {getAvgScore()}%
-              </div>
-
-              <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '30px' }}>
-                {history.map((item, idx) => (
-                  <div key={idx} style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    padding: '16px',
-                    borderRadius: '8px'
-                  }}>
-                    <strong style={{ color: 'var(--text-bright)', display: 'block', marginBottom: '6px' }}>
-                      Q{idx + 1}: {item.question}
-                    </strong>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
-                      Your Answer: <em>"{item.user_answer}"</em>
-                    </p>
-                    <div style={{ fontSize: '0.85rem' }}>
-                      Score: <strong style={{ color: 'var(--color-green)' }}>{item.evaluation.score}/100</strong>
+                <div className="space-y-4 text-left">
+                  {history.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 bg-slate-950/40 border border-white/5 rounded-xl space-y-2.5"
+                    >
+                      <strong className="text-slate-100 text-sm block">
+                        Q{idx + 1}: {item.question}
+                      </strong>
+                      <p className="text-xs text-slate-400 italic">
+                        Your Answer: "{item.user_answer}"
+                      </p>
+                      <div className="text-xs font-semibold text-slate-300">
+                        Score: <span className="text-emerald-400 font-mono font-bold">{item.evaluation.score}/100</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
 
-              <button onClick={restartMock} className="btn btn-primary" style={{ width: '200px' }}>
-                Restart Session
-              </button>
-            </div>
+                <Button
+                  onClick={restartMock}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 w-48 mt-4"
+                >
+                  Restart Session
+                </Button>
+              </CardContent>
+            </Card>
           )}
         </div>
       )}

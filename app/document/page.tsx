@@ -1,6 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function DocumentPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -87,9 +91,8 @@ export default function DocumentPage() {
     setSummary('');
 
     try {
-      // Call completions endpoint using custom backend prompt
       const prompt = `Please summarize the main concepts and technical learnings of this text in a bulleted outline:\n\n${rawText.slice(0, 5000)}`;
-      const res = await fetch('/api/career', { // We can reuse the completions model endpoint or route
+      const res = await fetch('/api/career', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ skills: prompt, experience: 0, interests: 'summarize' })
@@ -97,7 +100,6 @@ export default function DocumentPage() {
 
       if (!res.ok) throw new Error('Failed to generate summary.');
       const data = await res.json();
-      // Parse or handle response text
       const summaryText = data.alignment_reasoning || 'Could not parse outline summary.';
       setSummary(summaryText);
       localStorage.setItem('documentSummary', summaryText);
@@ -143,153 +145,145 @@ export default function DocumentPage() {
   };
 
   return (
-    <div>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>📚 Document Intelligence & RAG Engine</h1>
-
-      <div className="glass-card">
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>Semantic Study Assistant</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-          Ingest technical guidelines, textbooks, and documentation notes. The documents are parsed, chunked, embedded, and cataloged inside a local vector database. You can instantly ask complex technical questions and extract summaries.
-        </p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">📚 Document Intelligence & RAG Engine</h1>
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+          <CardContent className="pt-6">
+            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Semantic Study Assistant</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Ingest technical guidelines, textbooks, and documentation notes. The documents are parsed, chunked, embedded, and cataloged inside a local vector database. You can instantly ask complex technical questions and extract summaries.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '30px', alignItems: 'start' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
         {/* Ingestion Column */}
-        <div>
-          <form onSubmit={handleIngest} className="glass-card">
-            <h4 style={{ marginBottom: '16px' }}>Document Ingestion</h4>
+        <div className="lg:col-span-2 space-y-6">
+          <form onSubmit={handleIngest}>
+            <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-violet-500/20 transition-colors">
+              <CardHeader>
+                <CardTitle className="text-white text-lg font-bold">Document Ingestion</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                    Upload Textbook / Technical Reference
+                  </label>
+                  <div className="relative border border-dashed border-white/10 rounded-lg p-4 bg-slate-950/40 text-center hover:border-violet-500/30 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      accept=".pdf,.docx,.pptx,.txt"
+                      onChange={handleFileChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="text-slate-400 text-xs py-2">
+                      {file ? (
+                        <span className="text-emerald-400 font-medium flex items-center justify-center gap-1.5">
+                          <span>📄</span> {file.name}
+                        </span>
+                      ) : (
+                        <span>Drag & drop or click to upload PDF, DOCX, PPTX, or TXT</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
-              UPLOAD TEXTBOOK / TECHNICAL REFERENCE
-            </label>
-            <input
-              type="file"
-              accept=".pdf,.docx,.pptx,.txt"
-              onChange={handleFileChange}
-              style={{
-                marginBottom: '20px',
-                border: '1px solid var(--glass-border)',
-                padding: '10px',
-                background: 'rgba(15,23,42,0.4)',
-                width: '100%',
-                borderRadius: '8px',
-                color: 'var(--text-main)'
-              }}
-            />
+                {error && (
+                  <div className="text-rose-400 text-sm font-medium flex items-center gap-1.5">
+                    <span>⚠️</span> {error}
+                  </div>
+                )}
 
-            {error && <div style={{ color: 'var(--color-red)', fontSize: '0.9rem', marginBottom: '16px' }}>⚠️ {error}</div>}
-
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loadingIngest}
-              style={{ width: '100%' }}
-            >
-              {loadingIngest ? '🔮 Indexing Vector Store...' : '📚 Ingest & Index Vector Store'}
-            </button>
+                <Button
+                  type="submit"
+                  disabled={loadingIngest}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                >
+                  {loadingIngest ? '🔮 Indexing Vector Store...' : '📚 Ingest & Index Vector Store'}
+                </Button>
+              </CardContent>
+            </Card>
           </form>
 
           {ingestSuccess && (
-            <div className="glass-card">
-              <div className="neon-badge badge-green" style={{ marginBottom: '8px' }}>Ingested</div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-main)', marginBottom: '15px' }}>{ingestSuccess}</p>
-              
-              {rawText && (
-                <div>
-                  <button
-                    onClick={handleGenerateSummary}
-                    className="btn btn-secondary"
-                    disabled={loadingSummary}
-                    style={{ width: '100%', fontSize: '0.85rem', padding: '8px 16px' }}
-                  >
-                    {loadingSummary ? 'Generating Outline...' : 'Generate Smart Outline'}
-                  </button>
-
-                  {summary && (
-                    <div style={{
-                      marginTop: '15px',
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.05)',
-                      padding: '12px',
-                      borderRadius: '8px',
-                      fontSize: '0.85rem',
-                      color: 'var(--text-muted)',
-                      lineHeight: '1.6',
-                      maxHeight: '200px',
-                      overflowY: 'auto'
-                    }}>
-                      {summary}
-                    </div>
-                  )}
+            <Card className="border border-emerald-500/20 bg-emerald-950/10 backdrop-blur-md">
+              <CardContent className="pt-6 space-y-4">
+                <div className="inline-block px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full uppercase">
+                  Ingested
                 </div>
-              )}
-            </div>
+                <p className="text-slate-200 text-sm">{ingestSuccess}</p>
+                
+                {rawText && (
+                  <div className="space-y-4 pt-2">
+                    <Button
+                      onClick={handleGenerateSummary}
+                      disabled={loadingSummary}
+                      variant="outline"
+                      className="w-full text-slate-200 border-white/10 hover:bg-white/5 font-semibold text-xs"
+                    >
+                      {loadingSummary ? 'Generating Outline...' : 'Generate Smart Outline'}
+                    </Button>
+
+                    {summary && (
+                      <div className="mt-3 p-3 bg-slate-950/40 border border-white/5 rounded-lg text-slate-400 text-xs leading-relaxed max-h-[220px] overflow-y-auto font-sans scrollbar-thin">
+                        {summary}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
 
         {/* Query Column */}
-        <div className="glass-card" style={{ minHeight: '400px' }}>
-          <h4 style={{ marginBottom: '16px' }}>Semantic Question Answering (RAG)</h4>
-
-          <form onSubmit={handleQuery} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-            <div style={{ flex: 1 }}>
-              <input
-                type="text"
-                placeholder="Ask a question about the document..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                style={{ marginBottom: 0 }}
-              />
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loadingQuery}
-              style={{ padding: '12px 20px' }}
-            >
-              {loadingQuery ? 'Searching...' : '🔍 Search'}
-            </button>
-          </form>
-
-          {answer && (
-            <div style={{ marginTop: '25px' }}>
-              <strong style={{ color: 'var(--text-bright)', fontSize: '0.95rem' }}>Synthesized Answer:</strong>
-              <div style={{
-                marginTop: '8px',
-                background: 'rgba(139, 92, 246, 0.05)',
-                border: '1px solid rgba(139, 92, 246, 0.15)',
-                padding: '16px',
-                borderRadius: '12px',
-                fontSize: '0.9rem',
-                color: 'var(--text-main)',
-                lineHeight: '1.6'
-              }}>
-                {answer}
+        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-3 min-h-[400px]">
+          <CardHeader>
+            <CardTitle className="text-white text-lg font-bold">Semantic Question Answering (RAG)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <form onSubmit={handleQuery} className="flex gap-3 items-start">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder="Ask a question about the document..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="bg-slate-950/40 border-white/10 text-white focus-visible:border-violet-500/50 h-10"
+                />
               </div>
+              <Button
+                type="submit"
+                disabled={loadingQuery}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 px-5 transition-all duration-200 shrink-0"
+              >
+                {loadingQuery ? 'Searching...' : '🔍 Search'}
+              </Button>
+            </form>
 
-              {citation && (
-                <div style={{ marginTop: '20px' }}>
-                  <strong style={{ color: 'var(--text-bright)', fontSize: '0.9rem' }}>Retrieved Citation Context:</strong>
-                  <pre style={{
-                    marginTop: '6px',
-                    background: 'rgba(15, 23, 42, 0.8)',
-                    border: '1px solid var(--glass-border)',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    fontSize: '0.75rem',
-                    color: 'var(--text-muted)',
-                    whiteSpace: 'pre-wrap',
-                    fontFamily: 'monospace',
-                    maxHeight: '180px',
-                    overflowY: 'auto'
-                  }}>
-                    {citation}
-                  </pre>
+            {answer && (
+              <div className="space-y-5 pt-2">
+                <div>
+                  <h5 className="text-sm font-semibold text-slate-200 mb-2">Synthesized Answer:</h5>
+                  <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl text-slate-200 text-sm leading-relaxed">
+                    {answer}
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+
+                {citation && (
+                  <div>
+                    <h5 className="text-sm font-semibold text-slate-200 mb-2">Retrieved Citation Context:</h5>
+                    <pre className="p-4 bg-slate-950/60 border border-white/10 rounded-lg text-slate-400 text-[11px] leading-normal font-mono whitespace-pre-wrap max-h-[200px] overflow-y-auto scrollbar-thin">
+                      {citation}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -1,6 +1,10 @@
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
 import '@/app/globals.css';
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata = {
   title: 'Nexora AI – Career Intelligence Dashboard',
@@ -13,11 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <div className="layout-container">
+    <html lang="en" className={cn("font-sans dark", geist.variable)}>
+      <body className="antialiased bg-[#050811] text-slate-200">
+        <div className="flex min-h-screen">
           <Sidebar />
-          <main className="main-content">
+          <main className="flex-1 pl-[260px] p-10 max-w-[1200px] w-full">
             {children}
           </main>
         </div>
