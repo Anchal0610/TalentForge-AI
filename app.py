@@ -5,16 +5,9 @@ import sys
 # Add root folder to path so imports work correctly
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from database.connection import init_db
-from services.auth import (
-    handle_oauth_redirect,
-    login_button,
-    logout,
-    is_logged_in,
-    get_user,
-    is_configured as auth_configured,
-)
+from database.connection import init_db, db_manager
 from utils.logger import logger
+from auth import google_auth
 
 # Initialize database on application start
 try:
@@ -29,9 +22,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# Handle OAuth redirect callback
-handle_oauth_redirect()
 
 # Custom CSS for Next-Gen Aesthetic (Glassmorphism + Dark Mode + Neon Accents)
 st.markdown("""
@@ -103,35 +93,24 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar with authentication
-with st.sidebar:
-    st.markdown("### ⚡ Nexora AI")
-    st.divider()
-    if is_logged_in():
-        user = get_user()
-        st.markdown(f"**Welcome, {user.get('name', 'User')}**")
-        if user.get("picture"):
-            st.image(user["picture"], width=60)
-        st.caption(f"_{user.get('email', '')}_")
-        if st.button("🚪 Sign Out", use_container_width=True):
-            logout()
-            st.rerun()
-    else:
-        st.markdown("#### Sign In")
-        login_button()
-        if not auth_configured():
-            st.caption("Configure Google OAuth in .env")
-    st.divider()
-    st.page_link("app.py", label="🏠 Home", icon=None)
-    st.page_link("pages/1_Resume_Intelligence.py", label="📄 Resume ATS", icon=None)
-    st.page_link("pages/2_Career_Advisor.py", label="🎯 Career Advisor", icon=None)
-    st.page_link("pages/3_Skill_Gap.py", label="📊 Skill Gap", icon=None)
-    st.page_link("pages/4_Document_Intelligence.py", label="📚 Document RAG", icon=None)
-    st.page_link("pages/5_Interview_Prep.py", label="🎤 Interview Prep", icon=None)
-    st.page_link("pages/6_Knowledge_Graph.py", label="🕸️ Knowledge Graph", icon=None)
-    st.page_link("pages/7_Embedding_Visualization.py", label="🔮 Embeddings", icon=None)
-    st.page_link("pages/8_Roadmap_and_Readiness.py", label="🗺️ Roadmap", icon=None)
-    st.page_link("pages/9_Admin_Dashboard.py", label="⚙️ Admin", icon=None)
+# ── AUTHENTICATION GATE ──
+if "user" not in st.session_state:
+    user_info = google_auth.handle_callback()
+    if user_info:
+        try:
+            db_manager.save_user(
+                name=user_info["name"],
+                email=user_info["email"],
+                target_role="",
+                readiness_score=0.0
+            )
+        except Exception as e:
+            logger.error(f"Failed to save user after login: {e}")
+        st.session_state["user"] = user_info
+        st.query_params.clear()
+        st.rerun()
+    google_auth.render_login_page()
+    st.stop()
 
 # App Header
 st.markdown("""
@@ -142,6 +121,10 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
+# Sidebar user info
+with st.sidebar:
+    google_auth.render_logout()
 
 # Main Dashboard layout
 col1, col2 = st.columns([2, 1])
