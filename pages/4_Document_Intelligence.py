@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 from services.mistral_ocr import mistral_ocr_service
+from services.imagekit_service import imagekit_service
+from database.connection import db_manager
 from rag.chunking import document_chunker
 from rag.vector_store import vector_store
 from rag.retriever import retriever
@@ -47,7 +49,14 @@ with col1:
                 with open(temp_path, "wb") as f:
                     f.write(doc_file.getbuffer())
                 
+                file_url = None
                 try:
+                    # Upload to ImageKit
+                    file_bytes = doc_file.getbuffer()
+                    file_url = imagekit_service.upload_pdf(file_bytes, doc_file.name)
+                    if file_url:
+                        logger.info(f"Document uploaded to ImageKit: {file_url}")
+
                     # OCR extraction
                     raw_text = mistral_ocr_service.extract_text(temp_path)
                     
@@ -56,6 +65,16 @@ with col1:
                     
                     # Index in Qdrant
                     point_ids = vector_store.index_document(doc_name=doc_file.name, chunks=chunks)
+                    
+                    # Store document metadata in Neon DB
+                    try:
+                        db_manager.save_document(
+                            filename=doc_file.name,
+                            file_url=file_url,
+                            chunk_count=len(chunks)
+                        )
+                    except Exception as db_err:
+                        logger.error(f"Failed to save document to DB: {str(db_err)}")
                     
                     # Clean up
                     os.remove(temp_path)

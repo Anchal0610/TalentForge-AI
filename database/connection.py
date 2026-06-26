@@ -2,7 +2,10 @@ import os
 import sqlite3
 from typing import Dict, Any, List, Optional
 from contextlib import contextmanager
+from dotenv import load_dotenv
 from utils.logger import logger
+
+load_dotenv()
 try:
     import streamlit as st
     cache_resource = st.cache_resource
@@ -115,10 +118,21 @@ class DatabaseManager:
                 id {primary_key},
                 user_id INTEGER,
                 filename VARCHAR(255),
+                file_url TEXT,
                 raw_text TEXT,
                 ats_score REAL,
                 skills_json {json_type},
                 insights_json {json_type},
+                created_at TIMESTAMP DEFAULT {timestamp_syntax}
+            )
+            """,
+            # Documents
+            f"""
+            CREATE TABLE IF NOT EXISTS documents (
+                id {primary_key},
+                filename VARCHAR(255),
+                file_url TEXT,
+                chunk_count INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT {timestamp_syntax}
             )
             """,
@@ -206,7 +220,7 @@ class DatabaseManager:
                 logger.error(f"Database get_user failed: {str(e)}")
                 return None
 
-    def save_resume(self, user_id: int, filename: str, raw_text: str, ats_score: float) -> Dict[str, Any]:
+    def save_resume(self, user_id: int, filename: str, raw_text: str, ats_score: float, file_url: Optional[str] = None) -> Dict[str, Any]:
         """Saves parsed resume attributes."""
         postgres_mode = self.is_postgres_active()
         with self.get_connection() as conn:
@@ -214,22 +228,48 @@ class DatabaseManager:
                 if postgres_mode:
                     cursor = conn.cursor(cursor_factory=RealDictCursor)
                     cursor.execute("""
-                        INSERT INTO resumes (user_id, filename, raw_text, ats_score) 
-                        VALUES (%s, %s, %s, %s)
+                        INSERT INTO resumes (user_id, filename, file_url, raw_text, ats_score) 
+                        VALUES (%s, %s, %s, %s, %s)
                         RETURNING *
-                    """, (user_id, filename, raw_text, ats_score))
+                    """, (user_id, filename, file_url, raw_text, ats_score))
                     row = cursor.fetchone()
                     return dict(row) if row else {}
                 else:
                     cursor = conn.cursor()
                     cursor.execute(
-                        "INSERT INTO resumes (user_id, filename, raw_text, ats_score) VALUES (?, ?, ?, ?)",
-                        (user_id, filename, raw_text, ats_score)
+                        "INSERT INTO resumes (user_id, filename, file_url, raw_text, ats_score) VALUES (?, ?, ?, ?, ?)",
+                        (user_id, filename, file_url, raw_text, ats_score)
                     )
                     resume_id = cursor.lastrowid
-                    return {"id": resume_id, "user_id": user_id, "filename": filename, "raw_text": raw_text, "ats_score": ats_score}
+                    return {"id": resume_id, "user_id": user_id, "filename": filename, "file_url": file_url, "raw_text": raw_text, "ats_score": ats_score}
             except Exception as e:
                 logger.error(f"Database save_resume failed: {str(e)}")
+                raise e
+
+    def save_document(self, filename: str, file_url: Optional[str] = None, chunk_count: int = 0) -> Dict[str, Any]:
+        """Saves uploaded document metadata."""
+        postgres_mode = self.is_postgres_active()
+        with self.get_connection() as conn:
+            try:
+                if postgres_mode:
+                    cursor = conn.cursor(cursor_factory=RealDictCursor)
+                    cursor.execute("""
+                        INSERT INTO documents (filename, file_url, chunk_count) 
+                        VALUES (%s, %s, %s)
+                        RETURNING *
+                    """, (filename, file_url, chunk_count))
+                    row = cursor.fetchone()
+                    return dict(row) if row else {}
+                else:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "INSERT INTO documents (filename, file_url, chunk_count) VALUES (?, ?, ?)",
+                        (filename, file_url, chunk_count)
+                    )
+                    doc_id = cursor.lastrowid
+                    return {"id": doc_id, "filename": filename, "file_url": file_url, "chunk_count": chunk_count}
+            except Exception as e:
+                logger.error(f"Database save_document failed: {str(e)}")
                 raise e
 
 # Global instances
