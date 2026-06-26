@@ -3,6 +3,7 @@ import os
 from services.mistral_ocr import mistral_ocr_service
 from services.ats_service import ats_service
 from services.imagekit_service import imagekit_service
+from services.auth import is_logged_in, get_user
 from database.connection import db_manager
 from utils.logger import logger
 
@@ -35,7 +36,11 @@ with col1:
     st.subheader("Upload Resume")
     uploaded_file = st.file_uploader("Drop your resume file here", type=["pdf", "docx", "pptx", "txt"])
     
-    user_email = st.text_input("Your Email (to save results)", placeholder="you@example.com")
+    if is_logged_in():
+        user_email = get_user().get("email", "")
+        st.success(f"Signed in as **{user_email}**")
+    else:
+        user_email = st.text_input("Your Email (to save results)", placeholder="you@example.com")
     
     st.subheader("Target Job Description")
     job_description = st.text_area("Paste the job posting description here", height=250, placeholder="We are looking for a Senior Software Engineer skilled in Python, Docker, Qdrant...")
