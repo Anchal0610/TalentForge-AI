@@ -5,8 +5,9 @@ import sys
 # Add root folder to path so imports work correctly
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from database.connection import init_db
+from database.connection import init_db, db_manager
 from utils.logger import logger
+from auth import google_auth
 
 # Initialize database on application start
 try:
@@ -92,6 +93,25 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# ── AUTHENTICATION GATE ──
+if "user" not in st.session_state:
+    user_info = google_auth.handle_callback()
+    if user_info:
+        try:
+            db_manager.save_user(
+                name=user_info["name"],
+                email=user_info["email"],
+                target_role="",
+                readiness_score=0.0
+            )
+        except Exception as e:
+            logger.error(f"Failed to save user after login: {e}")
+        st.session_state["user"] = user_info
+        st.query_params.clear()
+        st.rerun()
+    google_auth.render_login_page()
+    st.stop()
+
 # App Header
 st.markdown("""
 <div style='text-align: center; margin-top: 2rem; margin-bottom: 3rem;'>
@@ -101,6 +121,10 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
+# Sidebar user info
+with st.sidebar:
+    google_auth.render_logout()
 
 # Main Dashboard layout
 col1, col2 = st.columns([2, 1])

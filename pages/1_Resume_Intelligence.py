@@ -2,8 +2,6 @@ import streamlit as st
 import os
 from services.mistral_ocr import mistral_ocr_service
 from services.ats_service import ats_service
-from services.imagekit_service import imagekit_service
-from database.connection import db_manager
 from utils.logger import logger
 
 st.set_page_config(page_title="Resume Intelligence & ATS Checker", page_icon="📄", layout="wide")
@@ -35,8 +33,6 @@ with col1:
     st.subheader("Upload Resume")
     uploaded_file = st.file_uploader("Drop your resume file here", type=["pdf", "docx", "pptx", "txt"])
     
-    user_email = st.text_input("Your Email (to save results)", placeholder="you@example.com")
-    
     st.subheader("Target Job Description")
     job_description = st.text_area("Paste the job posting description here", height=250, placeholder="We are looking for a Senior Software Engineer skilled in Python, Docker, Qdrant...")
 
@@ -55,16 +51,7 @@ with col2:
                 with open(temp_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
                 
-                file_url = None
                 try:
-                    # Upload to ImageKit
-                    file_bytes = uploaded_file.getbuffer()
-                    file_url = imagekit_service.upload_pdf(file_bytes, uploaded_file.name)
-                    if file_url:
-                        logger.info(f"Resume uploaded to ImageKit: {file_url}")
-                    else:
-                        logger.warning("ImageKit upload skipped or failed; proceeding without cloud storage.")
-
                     # Extract text using Mistral OCR (with fallback)
                     resume_text = mistral_ocr_service.extract_text(temp_path)
                     
@@ -97,29 +84,6 @@ with col2:
                     st.write("**ATS Optimization Areas (Missing Elements):**")
                     for weakness in results["weaknesses_improvements"]:
                         st.markdown(f"- ⚠️ {weakness}")
-
-                    # Store resume data in Neon DB
-                    if user_email:
-                        try:
-                            user = db_manager.get_user(user_email)
-                            if not user:
-                                user = db_manager.save_user(
-                                    name=user_email.split("@")[0],
-                                    email=user_email,
-                                    target_role="",
-                                    readiness_score=0.0
-                                )
-                            db_manager.save_resume(
-                                user_id=user["id"],
-                                filename=uploaded_file.name,
-                                raw_text=resume_text,
-                                ats_score=score,
-                                file_url=file_url
-                            )
-                            st.info(f"Resume saved to database with file URL: {file_url or 'N/A'}")
-                        except Exception as db_err:
-                            logger.error(f"Failed to save resume to DB: {str(db_err)}")
-                            st.warning("Resume analyzed but could not be saved to database.")
                         
                 except Exception as e:
                     st.error(f"Failed to process files: {str(e)}")
