@@ -13,7 +13,7 @@ st.markdown("""
     h1, h2, h3, h4 { font-family: 'Outfit', sans-serif !important; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #D946EF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .glass-card { background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 24px; backdrop-filter: blur(12px); margin-bottom: 20px; }
 </style>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 st.title("⚖️ Skill Gap Analysis")
 
@@ -24,7 +24,7 @@ st.markdown("""
         Select your target engineering title and compare your capabilities. The engine maps missing tech stacks, libraries, tools, and estimates study time to help prioritize your learning schedule.
     </p>
 </div>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 # Try loading predicted roles from advisor page, fallback to presets
 target_roles = st.session_state.get("predicted_roles", ["MLOps Engineer", "Data Engineer", "Backend Developer", "DevOps Specialist"])
@@ -75,7 +75,7 @@ with col2:
                     <div style="font-size: 0.9rem; color: #94A3B8;">SKILL GAP COEFFICIENT</div>
                     <div style="font-size: 3.5rem; font-weight: 700; color: {pct_color}; font-family: 'Outfit';">{pct}% Missing</div>
                 </div>
-                """, unsafe_allow_value=True)
+                """, unsafe_allow_html=True)
                 
                 # Store list of missing skills in session state
                 missing_names = [g.skill_name for g in gap_analysis.gaps]

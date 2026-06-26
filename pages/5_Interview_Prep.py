@@ -14,7 +14,7 @@ st.markdown("""
     h1, h2, h3, h4 { font-family: 'Outfit', sans-serif !important; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #D946EF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .glass-card { background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 24px; backdrop-filter: blur(12px); margin-bottom: 20px; }
 </style>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 st.title("🎤 AI Interview Preparation Suite")
 
@@ -25,7 +25,7 @@ st.markdown("""
         Generate target-focused questions, study multi-tiered responses (Beginner, Intermediate, Expert), and simulate an interactive mock evaluation. The engine analyzes your answer's keywords and coverage, suggesting key improvement steps.
     </p>
 </div>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 # Select parameters
 target_role = st.session_state.get("target_role", "MLOps Engineer")
@@ -117,7 +117,7 @@ with tab2:
             <div style="font-size: 0.8rem; color: #94A3B8;">MOCK QUESTION {idx+1} of {len(questions)}</div>
             <h4 style="color: #FFFFFF;">{questions[idx]}</h4>
         </div>
-        """, unsafe_allow_value=True)
+        """, unsafe_allow_html=True)
         
         user_response = st.text_area("Type your answer below:", height=150, placeholder="Start typing your explanation...")
         

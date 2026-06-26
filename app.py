@@ -90,7 +90,7 @@ st.markdown("""
         margin-top: 5px;
     }
 </style>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 # App Header
 st.markdown("""
@@ -100,7 +100,7 @@ st.markdown("""
         ANALYZE. LEARN. UPGRADE. GET INTERVIEW READY.
     </p>
 </div>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 # Main Dashboard layout
 col1, col2 = st.columns([2, 1])
@@ -125,7 +125,7 @@ with col1:
             </ul>
         </div>
     </div>
-    """, unsafe_allow_value=True)
+    """, unsafe_allow_html=True)
 
 with col2:
     st.markdown("""
@@ -151,11 +151,11 @@ with col2:
             </div>
         </div>
     </div>
-    """, unsafe_allow_value=True)
+    """, unsafe_allow_html=True)
 
 # Footer
 st.markdown("""
 <div style='text-align: center; margin-top: 5rem; padding-bottom: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem;'>
     <p style='font-size: 0.8rem; color: #64748B;'>Nexora AI &copy; 2026. Made with &hearts; for Hackathon Excellence.</p>
 </div>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)

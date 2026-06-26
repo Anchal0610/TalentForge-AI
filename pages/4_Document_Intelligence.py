@@ -17,7 +17,7 @@ st.markdown("""
     h1, h2, h3, h4 { font-family: 'Outfit', sans-serif !important; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #D946EF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .glass-card { background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 24px; backdrop-filter: blur(12px); margin-bottom: 20px; }
 </style>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 st.title("📚 Document Intelligence & RAG Engine")
 
@@ -28,7 +28,7 @@ st.markdown("""
         Ingest technical guidelines, textbooks, and documentation notes. The documents are parsed, chunked, embedded, and cataloged inside a local vector database. You can instantly ask complex technical questions and extract summaries.
     </p>
 </div>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 col1, col2 = st.columns([1, 1.2])
 

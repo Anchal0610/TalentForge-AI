@@ -16,7 +16,7 @@ st.markdown("""
     h1, h2, h3, h4 { font-family: 'Outfit', sans-serif !important; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #D946EF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .glass-card { background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 24px; backdrop-filter: blur(12px); margin-bottom: 20px; }
 </style>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 st.title("📄 Resume Intelligence & ATS Checker")
 
@@ -27,7 +27,7 @@ st.markdown("""
         Upload your resume (PDF, DOCX, PPTX, or TXT) and compare it against your target job description. Nexora AI's multi-agent parsing extracts your core skills, education, and milestones, scoring them directly against industry benchmarks.
     </p>
 </div>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -74,7 +74,7 @@ with col2:
                         <div style="font-size: 0.9rem; color: #94A3B8;">COMPATIBILITY INDEX</div>
                         <div style="font-size: 4rem; font-weight: 700; color: {color}; font-family: 'Outfit';">{score}%</div>
                     </div>
-                    """, unsafe_allow_value=True)
+                    """, unsafe_allow_html=True)
                     
                     st.write("**Extracted Skills:**")
                     st.write(", ".join(results["skills_extracted"]))

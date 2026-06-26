@@ -12,7 +12,7 @@ st.markdown("""
     h1, h2, h3, h4 { font-family: 'Outfit', sans-serif !important; background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #D946EF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .glass-card { background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 24px; backdrop-filter: blur(12px); margin-bottom: 20px; }
 </style>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 st.title("🕸️ Career Knowledge Graph Explorer")
 
@@ -23,7 +23,7 @@ st.markdown("""
         Visualize how your capabilities link to target engineering roles, technologies, projects, study guides, and mock interviews. Red connections indicate critical missing skills (gaps) to acquire.
     </p>
 </div>
-""", unsafe_allow_value=True)
+""", unsafe_allow_html=True)
 
 # Fetch from session state or use default seed data
 user_name = "Jane Doe"
@@ -61,7 +61,7 @@ with col2:
     - <span style="color:#D946EF; font-weight:bold;">● Study Guides</span>: Resources to close gaps.
     - <span style="color:#A855F7; font-weight:bold;">● Interview Questions</span>: Interactive practice files.
     - <span style="color:#EAB308; font-weight:bold;">● Project Node</span>: Portfolio builds.
-    """, unsafe_allow_value=True)
+    """, unsafe_allow_html=True)
     
     st.markdown("---")
     st.write(f"**Total nodes parsed:** {len(kg.graph.nodes)}")
