@@ -5,6 +5,7 @@ import '@/app/globals.css';
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { CareerProvider } from "@/components/CareerContext";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -21,23 +22,25 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans dark", geist.variable)}>
       <body className="antialiased bg-background text-white">
-        <TooltipProvider>
-          <div className="flex h-screen bg-background text-white overflow-hidden">
-            {/* Collapsible Sidebar */}
-            <Sidebar />
-            
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-              {/* Sticky Header TopBar */}
-              <TopBar />
+        <CareerProvider>
+          <TooltipProvider>
+            <div className="flex h-screen bg-background text-white overflow-hidden">
+              {/* Collapsible Sidebar */}
+              <Sidebar />
               
-              {/* Scrollable Dynamic Page Content */}
-              <main className="flex-1 overflow-y-auto p-6 space-y-6">
-                {children}
-              </main>
+              {/* Main Content Area */}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Sticky Header TopBar */}
+                <TopBar />
+                
+                {/* Scrollable Dynamic Page Content */}
+                <main className="flex-1 overflow-y-auto p-6 space-y-6">
+                  {children}
+                </main>
+              </div>
             </div>
-          </div>
-        </TooltipProvider>
+          </TooltipProvider>
+        </CareerProvider>
       </body>
     </html>
   );

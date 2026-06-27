@@ -74,18 +74,23 @@ class DatabaseManager {
     resumes: Resume[];
     documents: DocumentRecord[];
     mock_interviews: MockInterview[];
+    pipeline_sessions: { email: string; data: any; updated_at?: string }[];
   } {
     if (!fs.existsSync(this.jsonDbPath)) {
-      const defaultDb = { users: [], resumes: [], documents: [], mock_interviews: [] };
+      const defaultDb = { users: [], resumes: [], documents: [], mock_interviews: [], pipeline_sessions: [] };
       fs.writeFileSync(this.jsonDbPath, JSON.stringify(defaultDb, null, 2));
-      return defaultDb;
+      return defaultDb as any;
     }
     try {
       const content = fs.readFileSync(this.jsonDbPath, 'utf8');
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      if (!parsed.pipeline_sessions) {
+        parsed.pipeline_sessions = [];
+      }
+      return parsed;
     } catch (err) {
       console.error('Error reading JSON DB, resetting.', err);
-      return { users: [], resumes: [], documents: [], mock_interviews: [] };
+      return { users: [], resumes: [], documents: [], mock_interviews: [], pipeline_sessions: [] };
     }
   }
 
@@ -142,6 +147,15 @@ class DatabaseManager {
             answers_json JSONB,
             score REAL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        await pg.query(`
+          CREATE TABLE IF NOT EXISTS pipeline_sessions (
+            id SERIAL PRIMARY KEY,
+            email VARCHAR(255) UNIQUE NOT NULL,
+            data JSONB NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           )
         `);
         console.log('PostgreSQL schema initialized successfully.');
@@ -311,6 +325,61 @@ class DatabaseManager {
       data.dbHealthy = true;
     }
     return data;
+  }
+
+  public async savePipelineSession(email: string, data: any): Promise<any> {
+    const pg = await this.getPostgresClient();
+    if (pg) {
+      try {
+        const query = `
+          INSERT INTO pipeline_sessions (email, data, updated_at) 
+          VALUES ($1, $2, NOW())
+          ON CONFLICT (email) 
+          DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()
+          RETURNING *
+        `;
+        const res = await pg.query(query, [email, JSON.stringify(data)]);
+        return res.rows[0];
+      } finally {
+        await pg.end();
+      }
+    } else {
+      const db = this.readJsonDb();
+      let session = db.pipeline_sessions.find(s => s.email === email);
+      if (session) {
+        session.data = data;
+        session.updated_at = new Date().toISOString();
+      } else {
+        session = {
+          email,
+          data,
+          updated_at: new Date().toISOString()
+        };
+        db.pipeline_sessions.push(session);
+      }
+      this.writeJsonDb(db);
+      return session;
+    }
+  }
+
+  public async getPipelineSession(email: string): Promise<any | null> {
+    const pg = await this.getPostgresClient();
+    if (pg) {
+      try {
+        const res = await pg.query('SELECT * FROM pipeline_sessions WHERE email = $1', [email]);
+        if (res.rows.length > 0) {
+          const row = res.rows[0];
+          return typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
+        }
+        return null;
+      } finally {
+        await pg.end();
+      }
+    } else {
+      const db = this.readJsonDb();
+      const session = db.pipeline_sessions.find(s => s.email === email);
+      return session ? session.data : null;
+    }
   }
 }
 

@@ -1,348 +1,222 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useCareer } from '@/components/CareerContext';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-
-interface WeeklyPlanStep {
-  week: number;
-  topic: string;
-  resources: string[];
-  project_milestone: string;
-  certification_suggestion: string | null;
-}
-
-interface LearningRoadmap {
-  target_role: string;
-  weekly_plan: WeeklyPlanStep[];
-  estimated_completion_weeks: number;
-}
-
-interface CareerReadiness {
-  overall_percentage: number;
-  profile_strength: number;
-  skill_match_strength: number;
-  mock_interview_strength: number;
-  next_steps: string[];
-}
+import { 
+  Map, 
+  Clock, 
+  Award, 
+  Code,
+  Layers,
+  CheckCircle,
+  TrendingUp,
+  HelpCircle
+} from 'lucide-react';
+import Link from 'next/link';
 
 export default function RoadmapPage() {
-  const [targetRole, setTargetRole] = useState('MLOps Engineer');
-  const [missingSkills, setMissingSkills] = useState<string[]>(['Kubernetes', 'CI/CD Pipelines', 'Pinecone / Vector Databases']);
-  const [currentSkills, setCurrentSkills] = useState('Python, Docker, SQL, Flask');
-  
-  const [loadingRoadmap, setLoadingRoadmap] = useState(false);
-  const [roadmap, setRoadmap] = useState<LearningRoadmap | null>(null);
-  
-  const [loadingReadiness, setLoadingReadiness] = useState(false);
-  const [readiness, setReadiness] = useState<CareerReadiness | null>(null);
-  
-  const [error, setError] = useState('');
+  const { sessionData, loading, loadSession } = useCareer();
+  const [emailInput, setEmailInput] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const [expandedWeek, setExpandedWeek] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedRole = localStorage.getItem('targetRole') || 'MLOps Engineer';
-      setTargetRole(savedRole);
-
-      const savedSkills = localStorage.getItem('currentSkills') || 'Python, Docker, SQL, Flask';
-      setCurrentSkills(savedSkills);
-
-      const savedGaps = localStorage.getItem('missingSkills');
-      if (savedGaps) {
-        try {
-          setMissingSkills(JSON.parse(savedGaps));
-        } catch {
-          // ignore
-        }
-      }
-
-      // Load saved roadmap if exists
-      const savedRoadmap = localStorage.getItem('learningRoadmap');
-      if (savedRoadmap) {
-        try {
-          setRoadmap(JSON.parse(savedRoadmap));
-        } catch {
-          // ignore
-        }
-      }
-
-      // Load saved readiness if exists
-      const savedReadiness = localStorage.getItem('careerReadiness');
-      if (savedReadiness) {
-        try {
-          setReadiness(JSON.parse(savedReadiness));
-        } catch {
-          // ignore
-        }
-      }
-    }
-  }, []);
-
-  const generateRoadmap = async () => {
-    setLoadingRoadmap(true);
-    setError('');
-    setRoadmap(null);
-    setExpandedWeek(null);
-
-    try {
-      const res = await fetch('/api/roadmap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'roadmap',
-          targetRole,
-          missingSkills
-        })
-      });
-
-      if (!res.ok) throw new Error('Failed to generate roadmap curriculum.');
-      const data: LearningRoadmap = await res.json();
-      setRoadmap(data);
-      localStorage.setItem('learningRoadmap', JSON.stringify(data));
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoadingRoadmap(false);
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    if (!emailInput) return;
+    const found = await loadSession(emailInput);
+    if (!found) {
+      setErrorMsg('No session record found for this email. Please upload your resume first.');
     }
   };
 
-  const computeReadiness = async () => {
-    setLoadingReadiness(true);
-    setError('');
-    setReadiness(null);
-
-    try {
-      // Find average score from mock interview logs
-      let mockScore = 80;
-      const historyStr = localStorage.getItem('mockHistory');
-      if (historyStr) {
-        try {
-          const hist = JSON.parse(historyStr);
-          if (hist.length > 0) {
-            mockScore = Math.round(hist.reduce((acc: number, h: any) => acc + h.evaluation.score, 0) / hist.length);
-          }
-        } catch {
-          // ignore
-        }
-      }
-
-      const res = await fetch('/api/roadmap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'readiness',
-          targetRole,
-          currentSkills,
-          missingSkills,
-          mockScore
-        })
-      });
-
-      if (!res.ok) throw new Error('Failed to compute readiness indices.');
-      const data: CareerReadiness = await res.json();
-      setReadiness(data);
-      localStorage.setItem('careerReadiness', JSON.stringify(data));
-      localStorage.setItem('overallReadiness', data.overall_percentage.toString());
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoadingReadiness(false);
-    }
-  };
-
-  const getScoreTextColor = (score: number) => {
-    if (score >= 80) return 'text-white';
-    if (score >= 60) return 'text-zinc-300';
-    return 'text-zinc-450';
-  };
-
-  const getScoreBorderColor = (score: number) => {
-    if (score >= 80) return 'border-white/40';
-    if (score >= 60) return 'border-zinc-700';
-    return 'border-zinc-850';
+  // Helper score color mapper
+  const getScoreColorClass = (score: number) => {
+    if (score >= 80) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/5';
+    if (score >= 60) return 'text-amber-400 border-amber-500/30 bg-amber-500/5';
+    return 'text-rose-400 border-rose-500/30 bg-rose-500/5';
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white mb-2 uppercase">Learning Roadmaps & Career Readiness</h1>
-        <Card className="border border-zinc-850 bg-[#09090b]">
-          <CardContent className="pt-6">
-            <h3 className="text-sm font-semibold text-slate-200 mb-1.5 uppercase">Plan Your Skill Transition & Trace Success</h3>
-            <p className="text-zinc-400 text-xs leading-relaxed">
-              Explore your week-by-week custom syllabus complete with milestones and certifications. Monitor your Career Readiness score, structured using weighted profiles, mock transcripts, and core skills match metrics.
-            </p>
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      {/* 1. Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border/30 pb-4">
+        <div>
+          <h1 className="text-2xl font-bold uppercase tracking-tight text-white flex items-center gap-2">
+            <Map className="text-accent w-6 h-6" /> Study Roadmap & Readiness
+          </h1>
+          <p className="text-xs text-muted">Review your personalized technical study curriculum and target readiness metrics</p>
+        </div>
       </div>
 
-      {error && (
-        <div className="text-rose-450 text-xs font-semibold">
-          Error: {error}
-        </div>
-      )}
+      {/* 2. No Session State */}
+      {!sessionData ? (
+        <Card className="bg-surface border-border p-8 text-center max-w-xl mx-auto space-y-6 mt-10">
+          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto text-accent">
+            <Map className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-white uppercase tracking-wide">No Active Profile Session</h2>
+            <p className="text-xs text-muted leading-relaxed">
+              Nexora AI needs your parsed capabilities to compile a customized weekly study plan. Upload your resume or restore a previous session to start.
+            </p>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-        {/* Left Column: Weekly syllabus */}
-        <Card className="border border-zinc-850 bg-[#09090b] lg:col-span-3 min-h-[350px]">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-900 pb-3">
-            <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Weekly Learning Syllabus</CardTitle>
-            <Button
-              onClick={generateRoadmap}
-              disabled={loadingRoadmap}
-              className="bg-white hover:bg-zinc-200 text-black font-bold h-8 px-4 text-xs transition-colors rounded uppercase tracking-wider"
-            >
-              {loadingRoadmap ? 'Assembling...' : 'Create Roadmap'}
-            </Button>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {loadingRoadmap ? (
-              <div className="text-center py-20">
-                <div className="text-white text-sm font-bold animate-pulse uppercase tracking-wider">
-                  Assembling custom curriculum and projects...
-                </div>
-                <p className="text-zinc-500 text-[10px] mt-1.5 uppercase font-mono">
-                  Stitching technical tutorials and certification milestones
-                </p>
+          <div className="border-t border-border/30 pt-6">
+            <form onSubmit={handleLoginSubmit} className="space-y-3 max-w-sm mx-auto">
+              <div className="space-y-1.5 text-left">
+                <label className="text-[10px] font-bold text-muted uppercase tracking-wider">Email Address</label>
+                <Input
+                  type="email"
+                  required
+                  placeholder="you@example.com"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  className="bg-zinc-950 border-border text-white text-xs h-9"
+                />
               </div>
-            ) : roadmap ? (
-              <div className="space-y-4">
-                <div className="text-zinc-300 font-semibold text-xs uppercase font-mono">
-                  Target Duration: {roadmap.estimated_completion_weeks} Weeks
-                </div>
+              {errorMsg && (
+                <p className="text-rose-400 text-[11px] font-medium text-left">{errorMsg}</p>
+              )}
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded cursor-pointer"
+              >
+                {loading ? 'Searching...' : 'Restore Session'}
+              </Button>
+            </form>
+          </div>
 
-                <div className="space-y-3">
-                  {roadmap.weekly_plan.map((step) => (
-                    <div
-                      key={step.week}
-                      className="border border-zinc-850 rounded overflow-hidden bg-zinc-950/20"
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setExpandedWeek(expandedWeek === step.week ? null : step.week)}
-                        className="w-full text-left bg-zinc-950/45 px-4 py-3 text-slate-100 font-semibold text-xs hover:bg-zinc-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none uppercase font-mono"
-                      >
-                        <span>Week {step.week}: {step.topic}</span>
-                        <span className="text-zinc-500 text-[10px]">{expandedWeek === step.week ? '▲' : '▼'}</span>
-                      </button>
+          <div className="text-xs text-muted">
+            OR{' '}
+            <Link href="/document-hub" className="text-accent underline font-semibold hover:text-accent-glow">
+              Upload Resume in Document Hub
+            </Link>
+          </div>
+        </Card>
+      ) : (
+        /* 3. Active Session View */
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+          
+          {/* Left Column: Weekly syllabus roadmap */}
+          <Card className="bg-surface border-border lg:col-span-3 p-5 space-y-4">
+            <CardHeader className="p-0 pb-3 border-b border-border/30 flex flex-row justify-between items-center">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-white">Weekly Study Curriculum</CardTitle>
+              <Badge className="bg-accent/15 text-accent border border-accent/25 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+                {sessionData.roadmap.length} Weeks Plan
+              </Badge>
+            </CardHeader>
 
-                      {expandedWeek === step.week && (
-                        <div className="p-4 space-y-3.5 text-xs leading-relaxed border-t border-zinc-900 bg-zinc-955/20">
-                          <div>
-                            <strong className="text-zinc-350 block mb-1 uppercase text-[10px] tracking-wide">Core Learning Resources</strong>
-                            <ul className="space-y-1 text-zinc-400 pl-0.5">
-                              {step.resources.map((res, i) => (
-                                <li key={i} className="flex items-center gap-2">
-                                  <span className="text-white font-mono font-bold">-</span>
-                                  <span>{res}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <strong className="text-zinc-355 block uppercase text-[10px] tracking-wide">Weekly Code Milestone</strong>
-                            <p className="text-zinc-400 italic mt-1 pl-0.5">💻 {step.project_milestone}</p>
-                          </div>
-                          {step.certification_suggestion && (
-                            <div className="flex items-center gap-2 pt-1 border-t border-zinc-900 mt-2">
-                              <strong className="text-zinc-500 uppercase text-[9px] tracking-wide">Suggested Cert:</strong>
-                              <span className="px-2 py-0.5 text-[10px] font-semibold text-zinc-300 bg-zinc-900 border border-zinc-800 rounded font-mono">
-                                {step.certification_suggestion}
-                              </span>
-                            </div>
-                          )}
+            <div className="space-y-3.5 pt-2">
+              {sessionData.roadmap.map((weekStep) => (
+                <div 
+                  key={weekStep.week_number}
+                  className="border border-border/60 rounded overflow-hidden bg-zinc-950/20"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setExpandedWeek(expandedWeek === weekStep.week_number ? null : weekStep.week_number)}
+                    className="w-full text-left bg-zinc-950/45 px-4 py-3 text-slate-100 font-semibold text-xs hover:bg-zinc-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none uppercase font-mono"
+                  >
+                    <span>Week {weekStep.week_number}: {weekStep.topic}</span>
+                    <span className="text-zinc-500 text-[10px]">{expandedWeek === weekStep.week_number ? '▲' : '▼'}</span>
+                  </button>
+
+                  {expandedWeek === weekStep.week_number && (
+                    <div className="p-4 space-y-4 text-xs leading-relaxed border-t border-border bg-zinc-955/20">
+                      <div>
+                        <strong className="text-zinc-400 block mb-1 uppercase text-[10px] tracking-wide">Core Learning Resources</strong>
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted">Study Tutorial:</span>
+                          <a 
+                            href={weekStep.resource_link} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="underline text-accent hover:text-accent-glow font-bold"
+                          >
+                            Link Reference
+                          </a>
                         </div>
-                      )}
+                      </div>
+
+                      <div>
+                        <strong className="text-zinc-400 block mb-1 uppercase text-[10px] tracking-wide">Weekly Project Milestone</strong>
+                        <p className="text-zinc-300 font-medium pl-0.5">💻 {weekStep.milestone}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Right Column: Readiness Scoring */}
+          <Card className="bg-surface border-border lg:col-span-2 p-5 space-y-6">
+            <CardHeader className="p-0 pb-3 border-b border-border/30">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-white">Composite Readiness Analysis</CardTitle>
+            </CardHeader>
+
+            <div className="space-y-6 pt-2">
+              {/* Readiness rating badge */}
+              <div className={cn(
+                "text-center border rounded p-6 bg-zinc-950/40",
+                getScoreColorClass(sessionData.readiness_score)
+              )}>
+                <div className="text-zinc-500 text-[9px] tracking-widest uppercase font-semibold">OVERALL READY LEVEL</div>
+                <div className="text-5xl font-extrabold mt-2 font-mono text-white">
+                  {sessionData.readiness_score}%
+                </div>
+              </div>
+
+              {/* Weight Details */}
+              <div className="text-xs space-y-2.5 border-t border-border/30 pt-4 uppercase tracking-wider text-muted font-sans">
+                <strong className="text-zinc-400 block mb-1 text-[10px] tracking-widest">Readiness Index Formula Weighting</strong>
+                <div className="flex justify-between items-center">
+                  <span>ATS Match Fit (30%):</span>
+                  <span className="text-white font-mono font-bold">{sessionData.ats_score}%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Skills Mapped (30%):</span>
+                  <span className="text-white font-mono font-bold">
+                    {Math.round((sessionData.skills_present.length / (sessionData.skills_present.length + sessionData.skills_missing.length)) * 100)}%
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Mock Interview (40%):</span>
+                  <span className="text-white font-mono font-bold">75.0%</span>
+                </div>
+              </div>
+
+              {/* Study Action Recommendations */}
+              <div className="border-t border-border/30 pt-4 space-y-3">
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider">Priority Study Recommendations</h4>
+                <div className="space-y-2">
+                  {sessionData.skills_missing.slice(0, 3).map((gap, idx) => (
+                    <div 
+                      key={idx}
+                      className="p-2.5 bg-zinc-950/40 border border-border/40 rounded flex items-center gap-2.5 text-xs"
+                    >
+                      <Award className="w-4 h-4 text-accent shrink-0" />
+                      <div>
+                        <span>Learn <strong>{gap.skill_name}</strong></span>
+                        <span className="text-[10px] text-muted block">Expected time commitment: {gap.estimated_learning_hours} hours.</span>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-24 text-zinc-500 text-xs uppercase tracking-wider font-mono">
-                Click "Create Roadmap" to compile a weekly study curriculum.
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* Right Column: Readiness Scoring */}
-        <Card className="border border-zinc-850 bg-[#09090b] lg:col-span-2 min-h-[350px]">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-900 pb-3">
-            <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Readiness Analytics</CardTitle>
-            <Button
-              onClick={computeReadiness}
-              disabled={loadingReadiness}
-              className="bg-white hover:bg-zinc-200 text-black font-bold h-8 px-4 text-xs transition-colors rounded uppercase tracking-wider"
-            >
-              {loadingReadiness ? 'Computing...' : 'Compute Score'}
-            </Button>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {loadingReadiness ? (
-              <div className="text-center py-20">
-                <div className="text-white text-sm font-bold animate-pulse uppercase tracking-wider">
-                  Analyzing performance profiles...
-                </div>
-                <p className="text-zinc-500 text-[10px] mt-1.5 uppercase font-mono">
-                  Querying database entries and compiling capability scales
-                </p>
-              </div>
-            ) : readiness ? (
-              <div className="space-y-6">
-                {/* Readiness Grade badge */}
-                <div className={cn(
-                  "text-center border rounded p-6 bg-zinc-950/40",
-                  getScoreBorderColor(readiness.overall_percentage)
-                )}>
-                  <div className="text-zinc-500 text-[10px] tracking-widest uppercase font-semibold">INDEX LEVEL</div>
-                  <div className={cn(
-                    "text-5xl font-extrabold mt-2 font-mono",
-                    getScoreTextColor(readiness.overall_percentage)
-                  )}>
-                    {readiness.overall_percentage}%
-                  </div>
-                </div>
-
-                {/* Breakdown */}
-                <div className="text-xs space-y-2 border-t border-zinc-900 pt-4 uppercase tracking-wide">
-                  <strong className="text-zinc-500 block mb-1 text-[10px]">Assessment Weights Breakdown</strong>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Resume strength:</span>
-                    <code className="text-white font-bold font-mono">{readiness.profile_strength}%</code>
-                  </div>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Technical skills fit:</span>
-                    <code className="text-white font-bold font-mono">{readiness.skill_match_strength}%</code>
-                  </div>
-                  <div className="flex justify-between text-zinc-400">
-                    <span>Mock interview:</span>
-                    <code className="text-white font-bold font-mono">{readiness.mock_interview_strength}%</code>
-                  </div>
-                </div>
-
-                {/* Next Steps */}
-                <div className="border-t border-zinc-900 pt-4">
-                  <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2.5">Next Immediate Steps</h5>
-                  <ul className="space-y-2 text-zinc-400 text-xs pl-0.5">
-                    {readiness.next_steps.map((step, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-white font-mono font-bold">-</span>
-                        <span>{step}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-24 text-zinc-500 text-xs uppercase tracking-wider font-mono">
-                Click "Compute Score" to calculate candidate readiness indices.
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

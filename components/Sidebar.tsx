@@ -43,13 +43,10 @@ export default function Sidebar() {
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
-    { href: '/resume', label: 'Resume ATS', icon: FileText },
-    { href: '/career', label: 'Career Advisor', icon: Compass },
-    { href: '/skills', label: 'Skill Gap', icon: TrendingUp },
-    { href: '/document', label: 'Document RAG', icon: Database },
+    { href: '/document-hub', label: 'Document Hub', icon: Database },
+    { href: '/career-intelligence', label: 'Career Intelligence', icon: Compass },
+    { href: '/skill-intelligence', label: 'Skill Intelligence', icon: Network },
     { href: '/interview', label: 'Interview Prep', icon: MessageSquare },
-    { href: '/graph', label: 'Knowledge Graph', icon: Network },
-    { href: '/embeddings', label: 'Embeddings', icon: Binary },
     { href: '/roadmap', label: 'Roadmap', icon: Map },
     { href: '/admin', label: 'Admin', icon: Settings },
   ];
