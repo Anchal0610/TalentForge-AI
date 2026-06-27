@@ -153,25 +153,25 @@ export default function RoadmapPage() {
   };
 
   const getScoreTextColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-400';
-    if (score >= 60) return 'text-amber-400';
-    return 'text-rose-400';
+    if (score >= 80) return 'text-white';
+    if (score >= 60) return 'text-zinc-300';
+    return 'text-zinc-450';
   };
 
   const getScoreBorderColor = (score: number) => {
-    if (score >= 80) return 'border-emerald-500/30';
-    if (score >= 60) return 'border-amber-500/30';
-    return 'border-rose-500/30';
+    if (score >= 80) return 'border-white/40';
+    if (score >= 60) return 'border-zinc-700';
+    return 'border-zinc-850';
   };
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">🛣️ Learning Roadmaps & Career Readiness</h1>
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+        <h1 className="text-2xl font-bold tracking-tight text-white mb-2 uppercase">Learning Roadmaps & Career Readiness</h1>
+        <Card className="border border-zinc-850 bg-[#09090b]">
           <CardContent className="pt-6">
-            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Plan Your Skill Transition & Trace Success</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="text-sm font-semibold text-slate-200 mb-1.5 uppercase">Plan Your Skill Transition & Trace Success</h3>
+            <p className="text-zinc-400 text-xs leading-relaxed">
               Explore your week-by-week custom syllabus complete with milestones and certifications. Monitor your Career Readiness score, structured using weighted profiles, mock transcripts, and core skills match metrics.
             </p>
           </CardContent>
@@ -179,76 +179,76 @@ export default function RoadmapPage() {
       </div>
 
       {error && (
-        <div className="text-rose-400 text-sm font-medium flex items-center gap-1.5">
-          <span>⚠️</span> {error}
+        <div className="text-rose-450 text-xs font-semibold">
+          Error: {error}
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
         {/* Left Column: Weekly syllabus */}
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-3 min-h-[350px]">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-white text-lg font-bold">Your Weekly Learning Syllabus</CardTitle>
+        <Card className="border border-zinc-850 bg-[#09090b] lg:col-span-3 min-h-[350px]">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-900 pb-3">
+            <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Weekly Learning Syllabus</CardTitle>
             <Button
               onClick={generateRoadmap}
               disabled={loadingRoadmap}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-9 px-4 text-xs transition-all duration-200"
+              className="bg-white hover:bg-zinc-200 text-black font-bold h-8 px-4 text-xs transition-colors rounded uppercase tracking-wider"
             >
               {loadingRoadmap ? 'Assembling...' : 'Create Roadmap'}
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {loadingRoadmap ? (
               <div className="text-center py-20">
-                <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                <div className="text-white text-sm font-bold animate-pulse uppercase tracking-wider">
                   Assembling custom curriculum and projects...
                 </div>
-                <p className="text-slate-500 text-xs mt-2">
+                <p className="text-zinc-500 text-[10px] mt-1.5 uppercase font-mono">
                   Stitching technical tutorials and certification milestones
                 </p>
               </div>
             ) : roadmap ? (
               <div className="space-y-4">
-                <div className="text-emerald-400 font-semibold text-xs flex items-center gap-1">
-                  <span>✓</span> Target Duration: {roadmap.estimated_completion_weeks} Weeks
+                <div className="text-zinc-300 font-semibold text-xs uppercase font-mono">
+                  Target Duration: {roadmap.estimated_completion_weeks} Weeks
                 </div>
 
                 <div className="space-y-3">
                   {roadmap.weekly_plan.map((step) => (
                     <div
                       key={step.week}
-                      className="border border-white/10 rounded-lg overflow-hidden bg-slate-950/20"
+                      className="border border-zinc-850 rounded overflow-hidden bg-zinc-950/20"
                     >
                       <button
                         type="button"
                         onClick={() => setExpandedWeek(expandedWeek === step.week ? null : step.week)}
-                        className="w-full text-left bg-slate-950/45 px-4 py-3 text-slate-100 font-semibold text-sm hover:bg-slate-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none"
+                        className="w-full text-left bg-zinc-950/45 px-4 py-3 text-slate-100 font-semibold text-xs hover:bg-zinc-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none uppercase font-mono"
                       >
-                        <span>📅 WEEK {step.week}: {step.topic}</span>
-                        <span className="text-slate-500 text-xs">{expandedWeek === step.week ? '▲' : '▼'}</span>
+                        <span>Week {step.week}: {step.topic}</span>
+                        <span className="text-zinc-500 text-[10px]">{expandedWeek === step.week ? '▲' : '▼'}</span>
                       </button>
 
                       {expandedWeek === step.week && (
-                        <div className="p-4 space-y-3.5 text-xs leading-relaxed border-t border-white/5 bg-slate-950/20">
+                        <div className="p-4 space-y-3.5 text-xs leading-relaxed border-t border-zinc-900 bg-zinc-955/20">
                           <div>
-                            <strong className="text-slate-350 block mb-1">Core Learning Resources:</strong>
-                            <ul className="space-y-1 text-slate-400 pl-1">
+                            <strong className="text-zinc-350 block mb-1 uppercase text-[10px] tracking-wide">Core Learning Resources</strong>
+                            <ul className="space-y-1 text-zinc-400 pl-0.5">
                               {step.resources.map((res, i) => (
-                                <li key={i} className="flex items-center gap-1.5">
-                                  <span className="text-blue-500">•</span>
+                                <li key={i} className="flex items-center gap-2">
+                                  <span className="text-white font-mono font-bold">-</span>
                                   <span>{res}</span>
                                 </li>
                               ))}
                             </ul>
                           </div>
                           <div>
-                            <strong className="text-slate-355 block">Weekly Code Milestone:</strong>
-                            <p className="text-slate-400 italic mt-1 pl-1">💻 {step.project_milestone}</p>
+                            <strong className="text-zinc-355 block uppercase text-[10px] tracking-wide">Weekly Code Milestone</strong>
+                            <p className="text-zinc-400 italic mt-1 pl-0.5">💻 {step.project_milestone}</p>
                           </div>
                           {step.certification_suggestion && (
-                            <div className="flex items-center gap-2 pt-1">
-                              <strong className="text-slate-350">Suggested Cert:</strong>
-                              <span className="px-2 py-0.5 text-[10px] font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                            <div className="flex items-center gap-2 pt-1 border-t border-zinc-900 mt-2">
+                              <strong className="text-zinc-500 uppercase text-[9px] tracking-wide">Suggested Cert:</strong>
+                              <span className="px-2 py-0.5 text-[10px] font-semibold text-zinc-300 bg-zinc-900 border border-zinc-800 rounded font-mono">
                                 {step.certification_suggestion}
                               </span>
                             </div>
@@ -260,7 +260,7 @@ export default function RoadmapPage() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-24 text-slate-500 text-sm">
+              <div className="text-center py-24 text-zinc-500 text-xs uppercase tracking-wider font-mono">
                 Click "Create Roadmap" to compile a weekly study curriculum.
               </div>
             )}
@@ -268,24 +268,24 @@ export default function RoadmapPage() {
         </Card>
 
         {/* Right Column: Readiness Scoring */}
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-2 min-h-[350px]">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-white text-lg font-bold">Readiness Analytics</CardTitle>
+        <Card className="border border-zinc-850 bg-[#09090b] lg:col-span-2 min-h-[350px]">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-900 pb-3">
+            <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Readiness Analytics</CardTitle>
             <Button
               onClick={computeReadiness}
               disabled={loadingReadiness}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-9 px-4 text-xs transition-all duration-200"
+              className="bg-white hover:bg-zinc-200 text-black font-bold h-8 px-4 text-xs transition-colors rounded uppercase tracking-wider"
             >
               {loadingReadiness ? 'Computing...' : 'Compute Score'}
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {loadingReadiness ? (
               <div className="text-center py-20">
-                <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                <div className="text-white text-sm font-bold animate-pulse uppercase tracking-wider">
                   Analyzing performance profiles...
                 </div>
-                <p className="text-slate-500 text-xs mt-2">
+                <p className="text-zinc-500 text-[10px] mt-1.5 uppercase font-mono">
                   Querying database entries and compiling capability scales
                 </p>
               </div>
@@ -293,10 +293,10 @@ export default function RoadmapPage() {
               <div className="space-y-6">
                 {/* Readiness Grade badge */}
                 <div className={cn(
-                  "text-center border rounded-xl p-6 bg-slate-950/40 backdrop-blur-sm",
+                  "text-center border rounded p-6 bg-zinc-950/40",
                   getScoreBorderColor(readiness.overall_percentage)
                 )}>
-                  <div className="text-slate-400 text-xs tracking-widest uppercase font-semibold">INDEX LEVEL</div>
+                  <div className="text-zinc-500 text-[10px] tracking-widest uppercase font-semibold">INDEX LEVEL</div>
                   <div className={cn(
                     "text-5xl font-extrabold mt-2 font-mono",
                     getScoreTextColor(readiness.overall_percentage)
@@ -306,29 +306,29 @@ export default function RoadmapPage() {
                 </div>
 
                 {/* Breakdown */}
-                <div className="text-xs space-y-2 border-t border-white/10 pt-4">
-                  <strong className="text-slate-200 block mb-1">Assessment Weights Breakdown:</strong>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Resume strength weight:</span>
-                    <code className="text-slate-200 font-semibold">{readiness.profile_strength}%</code>
+                <div className="text-xs space-y-2 border-t border-zinc-900 pt-4 uppercase tracking-wide">
+                  <strong className="text-zinc-500 block mb-1 text-[10px]">Assessment Weights Breakdown</strong>
+                  <div className="flex justify-between text-zinc-400">
+                    <span>Resume strength:</span>
+                    <code className="text-white font-bold font-mono">{readiness.profile_strength}%</code>
                   </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Technical skills fit weight:</span>
-                    <code className="text-slate-200 font-semibold">{readiness.skill_match_strength}%</code>
+                  <div className="flex justify-between text-zinc-400">
+                    <span>Technical skills fit:</span>
+                    <code className="text-white font-bold font-mono">{readiness.skill_match_strength}%</code>
                   </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Mock interview proficiency weight:</span>
-                    <code className="text-slate-200 font-semibold">{readiness.mock_interview_strength}%</code>
+                  <div className="flex justify-between text-zinc-400">
+                    <span>Mock interview:</span>
+                    <code className="text-white font-bold font-mono">{readiness.mock_interview_strength}%</code>
                   </div>
                 </div>
 
                 {/* Next Steps */}
-                <div className="border-t border-white/10 pt-4">
-                  <h5 className="text-sm font-semibold text-slate-200 mb-2.5">Next Immediate Steps:</h5>
-                  <ul className="space-y-2 text-slate-400 text-xs pl-1">
+                <div className="border-t border-zinc-900 pt-4">
+                  <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2.5">Next Immediate Steps</h5>
+                  <ul className="space-y-2 text-zinc-400 text-xs pl-0.5">
                     {readiness.next_steps.map((step, i) => (
-                      <li key={i} className="flex items-start gap-2.5">
-                        <span className="text-emerald-500 font-bold">✓</span>
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-white font-mono font-bold">-</span>
                         <span>{step}</span>
                       </li>
                     ))}
@@ -336,8 +336,8 @@ export default function RoadmapPage() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-24 text-slate-500 text-sm">
-                Click "Compute Score" to calculate candidate analytics coefficients.
+              <div className="text-center py-24 text-zinc-500 text-xs uppercase tracking-wider font-mono">
+                Click "Compute Score" to calculate candidate readiness indices.
               </div>
             )}
           </CardContent>

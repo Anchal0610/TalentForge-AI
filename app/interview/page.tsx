@@ -171,11 +171,11 @@ export default function InterviewPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">🎤 AI Interview Preparation Suite</h1>
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+        <h1 className="text-2xl font-bold tracking-tight text-white mb-2 uppercase">AI Interview Preparation Suite</h1>
+        <Card className="border border-zinc-850 bg-[#09090b]">
           <CardContent className="pt-6">
-            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Prepare for Live Assessments</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="text-sm font-semibold text-slate-200 mb-1.5 uppercase">Prepare for Live Assessments</h3>
+            <p className="text-zinc-400 text-xs leading-relaxed">
               Generate target-focused questions, study multi-tiered responses (Beginner, Intermediate, Expert), and simulate an interactive mock evaluation. The engine analyzes your answer's keywords and coverage, suggesting key improvement steps.
             </p>
           </CardContent>
@@ -183,28 +183,28 @@ export default function InterviewPage() {
       </div>
 
       {/* Tabs Menu */}
-      <div className="flex gap-4 border-b border-white/10 pb-px">
+      <div className="flex gap-4 border-b border-zinc-850 pb-px">
         <button
           onClick={() => setActiveTab('guide')}
           className={cn(
-            "px-4 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 outline-none",
+            "px-4 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-150 outline-none",
             activeTab === 'guide'
-              ? "border-purple-500 text-white"
-              : "border-transparent text-slate-400 hover:text-slate-200"
+              ? "border-white text-white"
+              : "border-transparent text-zinc-500 hover:text-zinc-300"
           )}
         >
-          📚 Question & Answer Bank
+          Question & Answer Bank
         </button>
         <button
           onClick={() => setActiveTab('mock')}
           className={cn(
-            "px-4 py-2.5 text-sm font-semibold border-b-2 transition-all duration-200 outline-none",
+            "px-4 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all duration-150 outline-none",
             activeTab === 'mock'
-              ? "border-purple-500 text-white"
-              : "border-transparent text-slate-400 hover:text-slate-200"
+              ? "border-white text-white"
+              : "border-transparent text-zinc-500 hover:text-zinc-300"
           )}
         >
-          🤖 Mock Interview Sim
+          Mock Interview Sim
         </button>
       </div>
 
@@ -212,65 +212,65 @@ export default function InterviewPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
           {/* Q&A Parameters Form */}
           <form onSubmit={generateGuide} className="lg:col-span-2">
-            <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-violet-500/20 transition-colors">
-              <CardHeader>
-                <CardTitle className="text-white text-lg font-bold">Generate Study Guides</CardTitle>
+            <Card className="border border-zinc-850 bg-[#09090b] hover:border-zinc-750 transition-colors">
+              <CardHeader className="border-b border-zinc-900 pb-3">
+                <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Generate Study Guides</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-5">
+              <CardContent className="space-y-5 pt-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                  <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                     Difficulty Level
                   </label>
                   <select
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
-                    className="w-full h-10 px-3 bg-slate-950/40 border border-white/10 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500 transition-colors"
+                    className="w-full h-10 px-3 bg-zinc-950 border border-zinc-850 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-500 transition-colors"
                   >
-                    <option value="All Levels" className="bg-[#050811] text-slate-200">All Levels</option>
-                    <option value="Easy" className="bg-[#050811] text-slate-200">Easy</option>
-                    <option value="Medium" className="bg-[#050811] text-slate-200">Medium</option>
-                    <option value="Hard" className="bg-[#050811] text-slate-200">Hard</option>
+                    <option value="All Levels" className="bg-black text-slate-200">All Levels</option>
+                    <option value="Easy" className="bg-black text-slate-200">Easy</option>
+                    <option value="Medium" className="bg-black text-slate-200">Medium</option>
+                    <option value="Hard" className="bg-black text-slate-200">Hard</option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                  <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                     Question Category
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full h-10 px-3 bg-slate-950/40 border border-white/10 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-violet-500 transition-colors"
+                    className="w-full h-10 px-3 bg-zinc-950 border border-zinc-850 rounded text-xs text-zinc-200 focus:outline-none focus:border-zinc-500 transition-colors"
                   >
-                    <option value="Technical" className="bg-[#050811] text-slate-200">Technical</option>
-                    <option value="HR / Behavioral" className="bg-[#050811] text-slate-200">HR / Behavioral</option>
-                    <option value="System Design" className="bg-[#050811] text-slate-200">System Design</option>
+                    <option value="Technical" className="bg-black text-slate-200">Technical</option>
+                    <option value="HR / Behavioral" className="bg-black text-slate-200">HR / Behavioral</option>
+                    <option value="System Design" className="bg-black text-slate-200">System Design</option>
                   </select>
                 </div>
 
                 <Button
                   type="submit"
                   disabled={loadingGuide}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                  className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded"
                 >
-                  {loadingGuide ? '🔮 Compiling guide...' : '🚀 Generate Q&A Guide'}
+                  {loadingGuide ? 'Compiling guide...' : 'Generate Q&A Guide'}
                 </Button>
               </CardContent>
             </Card>
           </form>
 
           {/* Guide list output */}
-          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-3 min-h-[350px]">
-            <CardHeader>
-              <CardTitle className="text-white text-lg font-bold">Study Guide Questions</CardTitle>
+          <Card className="border border-zinc-850 bg-[#09090b] lg:col-span-3 min-h-[350px]">
+            <CardHeader className="border-b border-zinc-900 pb-3">
+              <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Study Guide Questions</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {loadingGuide ? (
                 <div className="text-center py-20">
-                  <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                  <div className="text-white text-sm font-bold animate-pulse uppercase tracking-wider">
                     Compiling technical interview checklist...
                   </div>
-                  <p className="text-slate-500 text-xs mt-2">
+                  <p className="text-zinc-500 text-[10px] mt-1.5 uppercase font-mono">
                     Structuring answers for three experience tiers
                   </p>
                 </div>
@@ -279,42 +279,42 @@ export default function InterviewPage() {
                   {guideQuestions.map((q, idx) => (
                     <div
                       key={idx}
-                      className="border border-white/10 rounded-lg overflow-hidden bg-slate-950/20"
+                      className="border border-zinc-850 rounded overflow-hidden bg-zinc-950/20"
                     >
                       <button
                         type="button"
                         onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
-                        className="w-full text-left bg-slate-950/40 px-4 py-3 text-slate-100 font-semibold text-sm hover:bg-slate-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none"
+                        className="w-full text-left bg-zinc-950/40 px-4 py-3 text-slate-100 font-semibold text-xs hover:bg-zinc-900/50 flex justify-between items-center transition-colors cursor-pointer outline-none uppercase font-mono"
                       >
                         <span>Question {idx + 1}: {q.question}</span>
-                        <span className="text-slate-500 text-xs">{expandedIndex === idx ? '▲' : '▼'}</span>
+                        <span className="text-zinc-500 text-[10px]">{expandedIndex === idx ? '▲' : '▼'}</span>
                       </button>
 
                       {expandedIndex === idx && (
-                        <div className="p-4 space-y-4 text-xs leading-relaxed border-t border-white/5 bg-slate-950/20">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-slate-300">Category:</span>
-                            <span className="px-2 py-0.5 text-[10px] font-semibold text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                        <div className="p-4 space-y-4 text-xs leading-relaxed border-t border-zinc-900 bg-zinc-955/20">
+                          <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider">
+                            <span className="text-zinc-500">Category:</span>
+                            <span className="px-2 py-0.5 text-zinc-300 bg-zinc-900 border border-zinc-800 rounded">
                               {q.category}
                             </span>
                           </div>
                           <div>
-                            <span className="text-emerald-400 font-bold flex items-center gap-1 mb-1">
-                              <span>🟢</span> Beginner Response
+                            <span className="text-white font-bold block mb-1 uppercase text-[10px] tracking-wider">
+                              Beginner Response
                             </span>
-                            <p className="text-slate-400 bg-slate-950/40 p-2.5 rounded border border-white/5">{q.beginner_answer}</p>
+                            <p className="text-zinc-400 bg-zinc-950 p-2.5 rounded border border-zinc-900">{q.beginner_answer}</p>
                           </div>
                           <div>
-                            <span className="text-amber-400 font-bold flex items-center gap-1 mb-1">
-                              <span>🟡</span> Intermediate Response
+                            <span className="text-zinc-300 font-bold block mb-1 uppercase text-[10px] tracking-wider">
+                              Intermediate Response
                             </span>
-                            <p className="text-slate-400 bg-slate-950/40 p-2.5 rounded border border-white/5">{q.intermediate_answer}</p>
+                            <p className="text-zinc-400 bg-zinc-950 p-2.5 rounded border border-zinc-900">{q.intermediate_answer}</p>
                           </div>
                           <div>
-                            <span className="text-rose-400 font-bold flex items-center gap-1 mb-1">
-                              <span>🔴</span> Expert Response
+                            <span className="text-zinc-400 font-bold block mb-1 uppercase text-[10px] tracking-wider">
+                              Expert Response
                             </span>
-                            <p className="text-slate-400 bg-slate-950/40 p-2.5 rounded border border-white/5">{q.expert_answer}</p>
+                            <p className="text-zinc-450 bg-zinc-950 p-2.5 rounded border border-zinc-900">{q.expert_answer}</p>
                           </div>
                         </div>
                       )}
@@ -322,8 +322,8 @@ export default function InterviewPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-24 text-slate-500 text-sm">
-                  Click "Generate Q&A Guide" to compile custom target Q&A guide cards.
+                <div className="text-center py-24 text-zinc-500 text-xs uppercase tracking-wider font-mono">
+                  Click "Generate Q&A Guide" to compile guide cards.
                 </div>
               )}
             </CardContent>
@@ -333,20 +333,20 @@ export default function InterviewPage() {
         /* Tab 2: Mock simulator */
         <div className="max-w-3xl mx-auto">
           {mockIndex < mockQuestions.length ? (
-            <Card className="border border-white/10 border-l-4 border-l-purple-500 bg-slate-900/40 backdrop-blur-md">
-              <CardHeader className="pb-3">
-                <div className="text-[10px] tracking-wider text-slate-400 mb-1.5 uppercase font-semibold">
+            <Card className="border border-zinc-850 border-l-4 border-l-white bg-[#09090b]">
+              <CardHeader className="pb-3 border-b border-zinc-900">
+                <div className="text-[10px] tracking-wider text-zinc-500 mb-1.5 uppercase font-bold">
                   Mock Question {mockIndex + 1} of {mockQuestions.length}
                 </div>
-                <CardTitle className="text-xl text-white font-bold">{mockQuestions[mockIndex]}</CardTitle>
+                <CardTitle className="text-base text-white font-bold uppercase tracking-wide">{mockQuestions[mockIndex]}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-5">
+              <CardContent className="space-y-5 pt-4">
                 <form onSubmit={submitAnswer} className="space-y-4">
                   <Textarea
                     placeholder="Type your explanation here..."
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
-                    className="bg-slate-950/40 border-white/10 text-white min-h-[160px] focus-visible:border-violet-500/50"
+                    className="bg-zinc-950 border-zinc-850 text-white min-h-[160px] focus-visible:border-zinc-500 text-xs"
                     disabled={loadingEval || !!currentEval}
                   />
 
@@ -354,9 +354,9 @@ export default function InterviewPage() {
                     <Button
                       type="submit"
                       disabled={loadingEval || !userAnswer}
-                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                      className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded"
                     >
-                      {loadingEval ? '🔮 Evaluating Response...' : 'Submit Answer'}
+                      {loadingEval ? 'Evaluating Response...' : 'Submit Answer'}
                     </Button>
                   ) : (
                     <div className="flex gap-4">
@@ -364,14 +364,14 @@ export default function InterviewPage() {
                         type="button"
                         variant="outline"
                         onClick={restartMock}
-                        className="flex-1 text-slate-200 border-white/10 hover:bg-white/5 h-10"
+                        className="flex-1 text-slate-200 border-zinc-850 hover:bg-zinc-900 h-9 text-xs uppercase tracking-wider rounded"
                       >
                         Restart Session
                       </Button>
                       <Button
                         type="button"
                         onClick={nextQuestion}
-                        className="flex-[1.5] bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10"
+                        className="flex-[1.5] bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider rounded"
                       >
                         Next Question
                       </Button>
@@ -380,18 +380,18 @@ export default function InterviewPage() {
                 </form>
 
                 {currentEval && (
-                  <div className="border-t border-white/10 pt-5 space-y-4">
-                    <div className="text-sm font-semibold text-slate-200 flex items-center gap-1.5">
+                  <div className="border-t border-zinc-900 pt-5 space-y-4">
+                    <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
                       <span>Grade Score:</span>
-                      <span className="text-emerald-400 font-mono text-lg font-bold">{currentEval.score}/100</span>
+                      <span className="text-white font-mono text-base font-bold">{currentEval.score}/100</span>
                     </div>
                     <div>
-                      <h5 className="text-xs font-semibold text-slate-300 mb-2">Missing Keywords:</h5>
-                      <div className="flex flex-wrap gap-2">
+                      <h5 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Missing Keywords</h5>
+                      <div className="flex flex-wrap gap-1.5">
                         {currentEval.missing_keywords.map((term, i) => (
                           <span
                             key={i}
-                            className="px-2 py-0.5 text-[10px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-full"
+                            className="px-2.5 py-0.5 text-[9px] font-semibold text-zinc-350 bg-zinc-900 border border-zinc-800 rounded uppercase font-mono"
                           >
                             {term}
                           </span>
@@ -399,8 +399,8 @@ export default function InterviewPage() {
                       </div>
                     </div>
                     <div>
-                      <h5 className="text-xs font-semibold text-slate-300 mb-1">Suggestions:</h5>
-                      <p className="text-slate-450 text-xs leading-relaxed bg-slate-950/40 p-3 rounded-lg border border-white/5">
+                      <h5 className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Suggestions</h5>
+                      <p className="text-zinc-400 text-xs leading-relaxed bg-zinc-955 p-3 rounded border border-zinc-900 font-sans">
                         {currentEval.improvements}
                       </p>
                     </div>
@@ -410,15 +410,15 @@ export default function InterviewPage() {
             </Card>
           ) : (
             /* Mock Recap */
-            <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md text-center">
+            <Card className="border border-zinc-850 bg-[#09090b] text-center">
               <CardHeader className="items-center pb-2">
-                <div className="inline-block px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full uppercase mb-2">
+                <div className="inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wider text-zinc-300 bg-zinc-900 border border-zinc-850 rounded uppercase mb-2">
                   Recap
                 </div>
-                <CardTitle className="text-2xl font-bold text-white">Mock Interview Completed!</CardTitle>
+                <CardTitle className="text-lg font-bold text-white uppercase tracking-wider">Mock Interview Completed</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-6xl font-extrabold text-emerald-400 font-mono py-4">
+                <div className="text-6xl font-extrabold text-white font-mono py-4">
                   {getAvgScore()}%
                 </div>
 
@@ -426,16 +426,17 @@ export default function InterviewPage() {
                   {history.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-4 bg-slate-950/40 border border-white/5 rounded-xl space-y-2.5"
+                      className="p-4 bg-zinc-950/40 border border-zinc-900 rounded space-y-2.5"
                     >
-                      <strong className="text-slate-100 text-sm block">
+                      <strong className="text-white text-xs block uppercase font-mono">
                         Q{idx + 1}: {item.question}
                       </strong>
-                      <p className="text-xs text-slate-400 italic">
+                      <p className="text-xs text-zinc-400 italic">
                         Your Answer: "{item.user_answer}"
                       </p>
-                      <div className="text-xs font-semibold text-slate-300">
-                        Score: <span className="text-emerald-400 font-mono font-bold">{item.evaluation.score}/100</span>
+                      <div className="text-xs font-semibold text-zinc-300 flex justify-between">
+                        <span>Evaluation:</span>
+                        <span className="text-white font-mono font-bold">{item.evaluation.score}/100</span>
                       </div>
                     </div>
                   ))}
@@ -443,7 +444,7 @@ export default function InterviewPage() {
 
                 <Button
                   onClick={restartMock}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 w-48 mt-4"
+                  className="bg-white hover:bg-zinc-200 text-black font-bold h-9 w-48 mt-4 text-xs uppercase tracking-wider rounded"
                 >
                   Restart Session
                 </Button>

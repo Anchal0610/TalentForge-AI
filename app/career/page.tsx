@@ -72,11 +72,11 @@ export default function CareerPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">🧭 AI Career Recommendations</h1>
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+        <h1 className="text-2xl font-bold tracking-tight text-white mb-2 uppercase">AI Career Recommendations</h1>
+        <Card className="border border-zinc-850 bg-[#09090b]">
           <CardContent className="pt-6">
-            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Discover Optimal Job Pathways</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="text-sm font-semibold text-slate-200 mb-1.5 uppercase">Discover Optimal Job Pathways</h3>
+            <p className="text-zinc-400 text-xs leading-relaxed">
               Leverage our multi-agent career intelligence engine to predict matching roles, check industry trends, and determine high-growth pathways suited to your unique skillset.
             </p>
           </CardContent>
@@ -86,26 +86,26 @@ export default function CareerPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Input Column */}
         <form onSubmit={generateRecommendations}>
-          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-violet-500/20 transition-colors">
-            <CardHeader>
-              <CardTitle className="text-white text-lg font-bold">Your Profile Parameters</CardTitle>
+          <Card className="border border-zinc-850 bg-[#09090b] hover:border-zinc-750 transition-colors">
+            <CardHeader className="border-b border-zinc-900 pb-3">
+              <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Profile Parameters</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-5 pt-4">
               <div className="space-y-2">
-                <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
-                  Your Technical Skills (comma separated)
+                <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
+                  Technical Skills (comma separated)
                 </label>
                 <Textarea
                   value={skills}
                   onChange={(e) => setSkills(e.target.value)}
-                  className="bg-slate-950/40 border-white/10 text-white min-h-[100px] focus-visible:border-violet-500/50"
+                  className="bg-zinc-950 border-zinc-850 text-white min-h-[100px] focus-visible:border-zinc-500 text-xs"
                 />
               </div>
 
-              <div className="space-y-2.5">
-                <div className="flex justify-between items-center text-xs font-semibold tracking-wider text-slate-400 uppercase">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                   <span>Years of Experience</span>
-                  <span className="text-violet-400 font-mono text-sm">{experience} Years</span>
+                  <span className="text-white font-mono text-xs">{experience} Years</span>
                 </div>
                 <input
                   type="range"
@@ -113,12 +113,12 @@ export default function CareerPage() {
                   max="15"
                   value={experience}
                   onChange={(e) => setExperience(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-slate-950/60 border border-white/10 rounded-lg appearance-none cursor-pointer accent-violet-500 focus:outline-none"
+                  className="w-full h-1.5 bg-zinc-950 border border-zinc-850 rounded appearance-none cursor-pointer accent-white focus:outline-none"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                   Interests / Career Goals
                 </label>
                 <Input
@@ -126,71 +126,72 @@ export default function CareerPage() {
                   placeholder="e.g. Cloud scale, AI, MLOps"
                   value={interests}
                   onChange={(e) => setInterests(e.target.value)}
-                  className="bg-slate-950/40 border-white/10 text-white focus-visible:border-violet-500/50"
+                  className="bg-zinc-950 border-zinc-850 text-white focus-visible:border-zinc-500 h-9 text-xs"
                 />
               </div>
 
               {error && (
-                <div className="text-rose-400 text-sm font-medium flex items-center gap-1.5">
-                  <span>⚠️</span> {error}
+                <div className="text-zinc-300 text-xs font-semibold">
+                  Error: {error}
                 </div>
               )}
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded"
               >
-                {loading ? '🔮 Plotting Pathways...' : '🧭 Generate Recommendations'}
+                {loading ? 'Plotting Pathways...' : 'Generate Recommendations'}
               </Button>
             </CardContent>
           </Card>
         </form>
 
         {/* Output Column */}
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md min-h-[400px]">
-          <CardHeader>
-            <CardTitle className="text-white text-lg font-bold">Recommended Pathways</CardTitle>
+        <Card className="border border-zinc-850 bg-[#09090b] min-h-[400px]">
+          <CardHeader className="border-b border-zinc-900 pb-3">
+            <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Recommended Pathways</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {loading ? (
               <div className="text-center py-24">
-                <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                <div className="text-white text-sm font-bold animate-pulse uppercase tracking-wider">
                   Analyzing technical capabilities against market trends...
                 </div>
-                <p className="text-slate-500 text-xs mt-2">
+                <p className="text-zinc-500 text-[10px] mt-1.5 uppercase font-mono">
                   Resolving role indexing and parsing salary vectors
                 </p>
               </div>
             ) : results ? (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-200 mb-3">Role Fit Recommendations:</h3>
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Role Fit Recommendations</h3>
                   <div className="flex flex-col gap-2">
                     {results.predicted_roles.map((role, idx) => (
-                      <div key={idx} className="flex items-center gap-2.5 text-slate-300 text-sm">
-                        <span className="text-amber-400">★</span>
-                        <strong className="text-white font-semibold">{role}</strong>
+                      <div key={idx} className="flex items-center gap-2 text-zinc-300 text-xs font-semibold uppercase">
+                        <span className="text-white font-mono font-bold">-</span>
+                        <span className="text-white">{role}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 pt-5">
-                  <h5 className="text-sm font-semibold text-slate-200 mb-2">Fit Alignment Reasoning:</h5>
-                  <p className="text-slate-400 text-xs leading-relaxed">
+                <div className="border-t border-zinc-900 pt-5">
+                  <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Fit Alignment Reasoning</h5>
+                  <p className="text-zinc-400 text-xs leading-relaxed">
                     {results.alignment_reasoning}
                   </p>
                 </div>
 
-                <div className="border-t border-white/10 pt-5">
-                  <h5 className="text-sm font-semibold text-slate-200 mb-2">Market Demand & Salary Trends:</h5>
-                  <ul className="space-y-2 text-slate-400 text-xs pl-1">
+                <div className="border-t border-zinc-900 pt-5">
+                  <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Market Demand & Salary Trends</h5>
+                  <ul className="space-y-2 text-zinc-400 text-xs pl-0.5">
                     {Object.entries(results.growth_trends).map(([role, trend], idx) => (
-                      <li key={idx} className="flex items-start gap-2.5">
-                        <span className="text-violet-400 font-bold">•</span>
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-white font-mono font-bold">*</span>
                         <span>
-                          <strong className="text-slate-200 font-semibold">{role}</strong>: {trend}
+                          <strong className="text-zinc-200 font-semibold uppercase text-[10px] tracking-wide block mb-0.5">{role}</strong>
+                          {trend}
                         </span>
                       </li>
                     ))}
@@ -198,8 +199,8 @@ export default function CareerPage() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-28 text-slate-500 text-sm">
-                Input your profile details and click "Generate Recommendations" to calculate pathway trends.
+              <div className="text-center py-28 text-zinc-500 text-xs uppercase tracking-wider font-mono">
+                Input profile details to calculate recommended career paths.
               </div>
             )}
           </CardContent>

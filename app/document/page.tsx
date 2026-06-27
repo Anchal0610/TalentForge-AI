@@ -147,11 +147,11 @@ export default function DocumentPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">📚 Document Intelligence & RAG Engine</h1>
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+        <h1 className="text-2xl font-bold tracking-tight text-white mb-2 uppercase">Document Intelligence & RAG Engine</h1>
+        <Card className="border border-zinc-850 bg-[#09090b]">
           <CardContent className="pt-6">
-            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Semantic Study Assistant</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="text-sm font-semibold text-slate-200 mb-1.5 uppercase">Semantic Study Assistant</h3>
+            <p className="text-zinc-400 text-xs leading-relaxed">
               Ingest technical guidelines, textbooks, and documentation notes. The documents are parsed, chunked, embedded, and cataloged inside a local vector database. You can instantly ask complex technical questions and extract summaries.
             </p>
           </CardContent>
@@ -162,26 +162,26 @@ export default function DocumentPage() {
         {/* Ingestion Column */}
         <div className="lg:col-span-2 space-y-6">
           <form onSubmit={handleIngest}>
-            <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-violet-500/20 transition-colors">
-              <CardHeader>
-                <CardTitle className="text-white text-lg font-bold">Document Ingestion</CardTitle>
+            <Card className="border border-zinc-850 bg-[#09090b] hover:border-zinc-750 transition-colors">
+              <CardHeader className="border-b border-zinc-900 pb-3">
+                <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Document Ingestion</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-5">
+              <CardContent className="space-y-5 pt-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                  <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                     Upload Textbook / Technical Reference
                   </label>
-                  <div className="relative border border-dashed border-white/10 rounded-lg p-4 bg-slate-950/40 text-center hover:border-violet-500/30 transition-colors cursor-pointer">
+                  <div className="relative border border-dashed border-zinc-800 rounded p-4 bg-zinc-950/40 text-center hover:border-zinc-550 transition-colors cursor-pointer">
                     <input
                       type="file"
                       accept=".pdf,.docx,.pptx,.txt"
                       onChange={handleFileChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <div className="text-slate-400 text-xs py-2">
+                    <div className="text-zinc-450 text-[11px] py-1.5 font-medium">
                       {file ? (
-                        <span className="text-emerald-400 font-medium flex items-center justify-center gap-1.5">
-                          <span>📄</span> {file.name}
+                        <span className="text-white font-semibold">
+                          Selected: {file.name}
                         </span>
                       ) : (
                         <span>Drag & drop or click to upload PDF, DOCX, PPTX, or TXT</span>
@@ -191,43 +191,43 @@ export default function DocumentPage() {
                 </div>
 
                 {error && (
-                  <div className="text-rose-400 text-sm font-medium flex items-center gap-1.5">
-                    <span>⚠️</span> {error}
+                  <div className="text-rose-400 text-xs font-semibold">
+                    Error: {error}
                   </div>
                 )}
 
                 <Button
                   type="submit"
                   disabled={loadingIngest}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                  className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded"
                 >
-                  {loadingIngest ? '🔮 Indexing Vector Store...' : '📚 Ingest & Index Vector Store'}
+                  {loadingIngest ? 'Indexing Vector Store...' : 'Ingest Vector Store'}
                 </Button>
               </CardContent>
             </Card>
           </form>
 
           {ingestSuccess && (
-            <Card className="border border-emerald-500/20 bg-emerald-950/10 backdrop-blur-md">
+            <Card className="border border-zinc-850 bg-[#09090b]">
               <CardContent className="pt-6 space-y-4">
-                <div className="inline-block px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-full uppercase">
+                <div className="inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wider text-zinc-300 bg-zinc-900 border border-zinc-850 rounded uppercase">
                   Ingested
                 </div>
-                <p className="text-slate-200 text-sm">{ingestSuccess}</p>
+                <p className="text-zinc-200 text-xs">{ingestSuccess}</p>
                 
                 {rawText && (
-                  <div className="space-y-4 pt-2">
+                  <div className="space-y-4 pt-2 border-t border-zinc-900">
                     <Button
                       onClick={handleGenerateSummary}
                       disabled={loadingSummary}
                       variant="outline"
-                      className="w-full text-slate-200 border-white/10 hover:bg-white/5 font-semibold text-xs"
+                      className="w-full text-slate-200 border-zinc-850 hover:bg-zinc-900 font-semibold text-xs py-1.5 rounded uppercase tracking-wider"
                     >
-                      {loadingSummary ? 'Generating Outline...' : 'Generate Smart Outline'}
+                      {loadingSummary ? 'Generating Outline...' : 'Generate Outline'}
                     </Button>
 
                     {summary && (
-                      <div className="mt-3 p-3 bg-slate-950/40 border border-white/5 rounded-lg text-slate-400 text-xs leading-relaxed max-h-[220px] overflow-y-auto font-sans scrollbar-thin">
+                      <div className="mt-3 p-3 bg-zinc-950 border border-zinc-850 rounded text-zinc-400 text-xs leading-relaxed max-h-[220px] overflow-y-auto font-mono scrollbar-thin">
                         {summary}
                       </div>
                     )}
@@ -239,11 +239,11 @@ export default function DocumentPage() {
         </div>
 
         {/* Query Column */}
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md lg:col-span-3 min-h-[400px]">
-          <CardHeader>
-            <CardTitle className="text-white text-lg font-bold">Semantic Question Answering (RAG)</CardTitle>
+        <Card className="border border-zinc-850 bg-[#09090b] lg:col-span-3 min-h-[400px]">
+          <CardHeader className="border-b border-zinc-900 pb-3">
+            <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Semantic Question Answering (RAG)</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-4">
             <form onSubmit={handleQuery} className="flex gap-3 items-start">
               <div className="flex-1">
                 <Input
@@ -251,31 +251,31 @@ export default function DocumentPage() {
                   placeholder="Ask a question about the document..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="bg-slate-950/40 border-white/10 text-white focus-visible:border-violet-500/50 h-10"
+                  className="bg-zinc-950 border-zinc-850 text-white focus-visible:border-zinc-500 h-9 text-xs"
                 />
               </div>
               <Button
                 type="submit"
                 disabled={loadingQuery}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 px-5 transition-all duration-200 shrink-0"
+                className="bg-white hover:bg-zinc-200 text-black font-bold h-9 px-5 text-xs uppercase tracking-wider transition-colors rounded shrink-0"
               >
-                {loadingQuery ? 'Searching...' : '🔍 Search'}
+                {loadingQuery ? 'Searching...' : 'Search'}
               </Button>
             </form>
 
             {answer && (
-              <div className="space-y-5 pt-2">
+              <div className="space-y-5 pt-2 border-t border-zinc-900">
                 <div>
-                  <h5 className="text-sm font-semibold text-slate-200 mb-2">Synthesized Answer:</h5>
-                  <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl text-slate-200 text-sm leading-relaxed">
+                  <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Synthesized Answer</h5>
+                  <div className="p-4 bg-zinc-950 border border-zinc-850 rounded text-zinc-300 text-xs leading-relaxed font-sans">
                     {answer}
                   </div>
                 </div>
 
                 {citation && (
                   <div>
-                    <h5 className="text-sm font-semibold text-slate-200 mb-2">Retrieved Citation Context:</h5>
-                    <pre className="p-4 bg-slate-950/60 border border-white/10 rounded-lg text-slate-400 text-[11px] leading-normal font-mono whitespace-pre-wrap max-h-[200px] overflow-y-auto scrollbar-thin">
+                    <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Retrieved Citation Context</h5>
+                    <pre className="p-4 bg-zinc-950 border border-zinc-850 rounded text-zinc-500 text-[10px] leading-normal font-mono whitespace-pre-wrap max-h-[200px] overflow-y-auto scrollbar-thin">
                       {citation}
                     </pre>
                   </div>

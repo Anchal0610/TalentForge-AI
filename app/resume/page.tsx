@@ -89,12 +89,10 @@ export default function ResumePage() {
       localStorage.setItem('atsResults', JSON.stringify(data));
       localStorage.setItem('atsScore', data.ats_score.toString());
       
-      // Seed overall readiness updates
       const currentReadiness = parseFloat(localStorage.getItem('overallReadiness') || '74.5');
       const updatedReadiness = Math.round(((data.ats_score + currentReadiness) / 2) * 10) / 10;
       localStorage.setItem('overallReadiness', updatedReadiness.toString());
 
-      // Seed default skills lists from parsed values for subsequent pages
       if (data.skills_extracted.length > 0) {
         localStorage.setItem('currentSkills', data.skills_extracted.slice(0, 5).join(', '));
       }
@@ -117,25 +115,25 @@ export default function ResumePage() {
   };
 
   const getScoreTextColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-400';
-    if (score >= 60) return 'text-amber-400';
-    return 'text-rose-400';
+    if (score >= 80) return 'text-white';
+    if (score >= 60) return 'text-zinc-300';
+    return 'text-zinc-450';
   };
 
   const getScoreBorderColor = (score: number) => {
-    if (score >= 80) return 'border-emerald-500/30';
-    if (score >= 60) return 'border-amber-500/30';
-    return 'border-rose-500/30';
+    if (score >= 80) return 'border-white/40';
+    if (score >= 60) return 'border-zinc-700';
+    return 'border-zinc-850';
   };
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">📄 Resume Intelligence & ATS Checker</h1>
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md mt-4">
+        <h1 className="text-2xl font-bold tracking-tight text-white mb-2 uppercase">Resume Intelligence & ATS Checker</h1>
+        <Card className="border border-zinc-850 bg-[#09090b]">
           <CardContent className="pt-6">
-            <h3 className="text-base font-semibold text-slate-200 mb-1.5">Optimize Your Resume for ATS Algorithms</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">
+            <h3 className="text-sm font-semibold text-slate-200 mb-1.5 uppercase">Optimize Your Resume for ATS Algorithms</h3>
+            <p className="text-zinc-400 text-xs leading-relaxed">
               Upload your resume (PDF, DOCX, PPTX, or TXT) and compare it against your target job description. Nexora AI's multi-agent parsing extracts your core skills, education, and milestones, scoring them directly against industry benchmarks.
             </p>
           </CardContent>
@@ -145,26 +143,26 @@ export default function ResumePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Left Form Column */}
         <form onSubmit={runDiagnostics}>
-          <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md hover:border-violet-500/20 transition-colors">
-            <CardHeader>
-              <CardTitle className="text-white text-lg font-bold">Diagnostic Inputs</CardTitle>
+          <Card className="border border-zinc-850 bg-[#09090b] hover:border-zinc-750 transition-colors">
+            <CardHeader className="border-b border-zinc-900 pb-3">
+              <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Diagnostic Inputs</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-5">
+            <CardContent className="space-y-5 pt-4">
               <div className="space-y-2">
-                <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                   Upload Resume File
                 </label>
-                <div className="relative border border-dashed border-white/10 rounded-lg p-4 bg-slate-950/40 text-center hover:border-violet-500/30 transition-colors cursor-pointer">
+                <div className="relative border border-dashed border-zinc-800 rounded p-4 bg-zinc-950/40 text-center hover:border-zinc-550 transition-colors cursor-pointer">
                   <input
                     type="file"
                     accept=".pdf,.docx,.pptx,.txt"
                     onChange={handleFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
-                  <div className="text-slate-400 text-xs py-2">
+                  <div className="text-zinc-450 text-[11px] py-1.5 font-medium">
                     {file ? (
-                      <span className="text-emerald-400 font-medium flex items-center justify-center gap-1.5">
-                        <span>📄</span> {file.name}
+                      <span className="text-white font-semibold">
+                        Selected: {file.name}
                       </span>
                     ) : (
                       <span>Drag & drop or click to upload PDF, DOCX, PPTX, or TXT</span>
@@ -174,7 +172,7 @@ export default function ResumePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                   Your Email (saves records)
                 </label>
                 <Input
@@ -182,51 +180,51 @@ export default function ResumePage() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-slate-950/40 border-white/10 text-white focus-visible:border-violet-500/50"
+                  className="bg-zinc-950 border-zinc-850 text-white focus-visible:border-zinc-500 h-9 text-xs"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+                <label className="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                   Target Job Description
                 </label>
                 <Textarea
                   placeholder="We are looking for a backend software engineer skilled in Python, Docker, Qdrant..."
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
-                  className="bg-slate-950/40 border-white/10 text-white min-h-[200px] focus-visible:border-violet-500/50"
+                  className="bg-zinc-950 border-zinc-850 text-white min-h-[180px] focus-visible:border-zinc-500 text-xs"
                 />
               </div>
 
               {error && (
-                <div className="text-rose-400 text-sm font-medium flex items-center gap-1.5">
-                  <span>⚠️</span> {error}
+                <div className="text-zinc-300 text-xs font-semibold">
+                  Error: {error}
                 </div>
               )}
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold h-10 transition-all duration-200"
+                className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded"
               >
-                {loading ? '🔮 Executing Diagnostics...' : '🚀 Run ATS Diagnostics'}
+                {loading ? 'Executing Diagnostics...' : 'Run ATS Diagnostics'}
               </Button>
             </CardContent>
           </Card>
         </form>
 
         {/* Right Output Column */}
-        <Card className="border border-white/10 bg-slate-900/40 backdrop-blur-md min-h-[400px]">
-          <CardHeader>
-            <CardTitle className="text-white text-lg font-bold">Analysis Results</CardTitle>
+        <Card className="border border-zinc-850 bg-[#09090b] min-h-[400px]">
+          <CardHeader className="border-b border-zinc-900 pb-3">
+            <CardTitle className="text-white text-sm font-bold uppercase tracking-wider">Analysis Results</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             {loading ? (
               <div className="text-center py-24">
-                <div className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent text-lg font-bold animate-pulse">
+                <div className="text-white text-sm font-bold animate-pulse uppercase tracking-wider">
                   Analyzing resume text and checking alignment...
                 </div>
-                <p className="text-slate-500 text-xs mt-2">
+                <p className="text-zinc-500 text-[10px] mt-1.5 uppercase font-mono">
                   Ingesting parser tables & querying model completing metrics
                 </p>
               </div>
@@ -234,10 +232,10 @@ export default function ResumePage() {
               <div className="space-y-6">
                 {/* ATS compatibility rating badge */}
                 <div className={cn(
-                  "text-center border rounded-xl p-6 bg-slate-950/40 backdrop-blur-sm",
+                  "text-center border rounded p-6 bg-zinc-950/40",
                   getScoreBorderColor(results.ats_score)
                 )}>
-                  <div className="text-slate-400 text-xs tracking-widest uppercase">COMPATIBILITY INDEX</div>
+                  <div className="text-zinc-500 text-[10px] tracking-widest uppercase font-semibold">COMPATIBILITY INDEX</div>
                   <div className={cn(
                     "text-6xl font-extrabold mt-2 font-mono",
                     getScoreTextColor(results.ats_score)
@@ -247,27 +245,27 @@ export default function ResumePage() {
                 </div>
 
                 {results.file_url && (
-                  <div className="text-xs text-blue-400 flex items-center gap-1">
-                    <span>✓</span> Uploaded cloud backup:{" "}
+                  <div className="text-[11px] text-zinc-300">
+                    Uploaded cloud backup:{" "}
                     <a
                       href={results.file_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="underline font-medium text-blue-300 hover:text-blue-200"
+                      className="underline font-bold text-white hover:text-zinc-300"
                     >
-                      File URL Link
+                      File Link URL
                     </a>
                   </div>
                 )}
 
                 <div className="space-y-5">
                   <div>
-                    <h5 className="text-sm font-semibold text-slate-200 mb-2">Extracted Skills:</h5>
-                    <div className="flex flex-wrap gap-2">
+                    <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Extracted Skills</h5>
+                    <div className="flex flex-wrap gap-1.5">
                       {results.skills_extracted.map((skill, index) => (
                         <span
                           key={index}
-                          className="px-2.5 py-1 text-xs font-semibold text-purple-300 bg-purple-500/10 border border-purple-500/30 rounded-full"
+                          className="px-2 py-0.5 text-[10px] font-semibold text-zinc-300 bg-zinc-900 border border-zinc-800 rounded uppercase font-mono"
                         >
                           {skill}
                         </span>
@@ -276,11 +274,11 @@ export default function ResumePage() {
                   </div>
 
                   <div>
-                    <h5 className="text-sm font-semibold text-slate-200 mb-2">Candidate Strengths:</h5>
-                    <ul className="space-y-1.5 text-slate-400 text-xs pl-1">
+                    <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Candidate Strengths</h5>
+                    <ul className="space-y-1.5 text-zinc-400 text-xs pl-0.5">
                       {results.strengths.map((str, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <span className="text-emerald-500 font-bold">✓</span>
+                          <span className="text-white font-mono font-bold">-</span>
                           <span>{str}</span>
                         </li>
                       ))}
@@ -288,12 +286,12 @@ export default function ResumePage() {
                   </div>
 
                   <div>
-                    <h5 className="text-sm font-semibold text-slate-200 mb-2">ATS Optimization Areas:</h5>
-                    <ul className="space-y-1.5 text-slate-400 text-xs pl-1">
+                    <h5 className="text-xs font-bold text-white uppercase tracking-wider mb-2">ATS Optimization Areas</h5>
+                    <ul className="space-y-1.5 text-zinc-400 text-xs pl-0.5">
                       {results.weaknesses_improvements.map((weak, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <span className="text-rose-500 font-bold">!</span>
-                          <span className="text-slate-300">{weak}</span>
+                          <span className="text-zinc-300 font-mono font-bold">*</span>
+                          <span className="text-zinc-300">{weak}</span>
                         </li>
                       ))}
                     </ul>
@@ -301,8 +299,8 @@ export default function ResumePage() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-28 text-slate-500 text-sm">
-                Upload your resume and paste a job description, then click "Run ATS Diagnostics" to begin.
+              <div className="text-center py-28 text-zinc-500 text-xs uppercase tracking-wider font-mono">
+                Upload resume and input description to start check.
               </div>
             )}
           </CardContent>
