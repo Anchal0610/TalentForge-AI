@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function DocumentHubPage() {
-  const { sessionData, loading, error, uploadResume, loadSession, clearSession } = useCareer();
+  const { email: loggedInEmail, sessionData, loading, error, uploadResume, loadSession, clearSession } = useCareer();
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState('');
   const [email, setEmail] = useState('');
@@ -47,8 +47,10 @@ export default function DocumentHubPage() {
   useEffect(() => {
     if (sessionData?.email) {
       setEmail(sessionData.email);
+    } else if (loggedInEmail) {
+      setEmail(loggedInEmail);
     }
-  }, [sessionData]);
+  }, [sessionData, loggedInEmail]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -171,50 +173,16 @@ export default function DocumentHubPage() {
 
       {/* 2. Login or Initial Upload View if no sessionData exists */}
       {!sessionData ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          
-          {/* A. Session Lookup */}
-          <Card className="bg-surface border-border p-5 space-y-4">
-            <CardHeader className="p-0">
-              <CardTitle className="text-sm font-bold uppercase tracking-wider text-white">Restore Previous Session</CardTitle>
-            </CardHeader>
-            <form onSubmit={handleEmailLoginSubmit} className="space-y-3.5">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold tracking-wider text-muted uppercase">Enter Email Address</label>
-                <Input
-                  type="email"
-                  required
-                  placeholder="you@example.com"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  className="bg-zinc-950 border-border text-white text-xs h-9"
-                />
-              </div>
-              {sessionChecked && !sessionData && (
-                <div className="flex items-center gap-2 p-3 rounded bg-amber-500/5 border border-amber-500/20 text-xs text-amber-300">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>No session found. Please fill in details on the right to start a new analysis.</span>
-                </div>
-              )}
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded cursor-pointer"
-              >
-                {loading ? 'Searching session...' : 'Load Session Data'}
-              </Button>
-            </form>
-          </Card>
-
-          {/* B. Full Pipeline Ingestion Upload */}
-          <Card className="bg-surface border-border p-5">
-            <CardHeader className="p-0 pb-3 border-b border-border/30 mb-4">
+        <div className="max-w-2xl mx-auto">
+          {/* Full Pipeline Ingestion Upload */}
+          <Card className="bg-surface border-border p-6 shadow-xl">
+            <CardHeader className="p-0 pb-3 border-b border-border/30 mb-5">
               <CardTitle className="text-sm font-bold uppercase tracking-wider text-white">Ingest New Resume & Target Job</CardTitle>
             </CardHeader>
-            <form onSubmit={handlePipelineSubmit} className="space-y-4">
+            <form onSubmit={handlePipelineSubmit} className="space-y-5">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold tracking-wider text-muted uppercase">Upload Resume File</label>
-                <div className="relative border border-dashed border-border rounded p-6 bg-zinc-950/40 text-center hover:border-accent/40 transition-colors cursor-pointer">
+                <div className="relative border border-dashed border-border rounded-lg p-6 bg-zinc-950/40 text-center hover:border-accent/40 transition-colors cursor-pointer">
                   <input
                     type="file"
                     required
@@ -234,14 +202,12 @@ export default function DocumentHubPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold tracking-wider text-muted uppercase">User Email (saves session)</label>
+                <label className="text-[10px] font-bold tracking-wider text-muted uppercase">User Email</label>
                 <Input
                   type="email"
-                  required
-                  placeholder="you@example.com"
+                  disabled
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-zinc-950 border-border text-white text-xs h-9"
+                  className="bg-zinc-950 border-border text-muted-foreground text-xs h-9 cursor-not-allowed select-none opacity-80"
                 />
               </div>
 

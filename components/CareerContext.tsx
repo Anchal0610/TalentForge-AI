@@ -68,13 +68,25 @@ export interface PipelineSessionData {
   created_at: string;
 }
 
+export interface User {
+  id?: number;
+  name: string;
+  email: string;
+  target_role?: string;
+  readiness_score: number;
+  created_at?: string;
+}
+
 interface CareerContextType {
   email: string;
+  user: User | null;
   sessionData: PipelineSessionData | null;
   loading: boolean;
   error: string | null;
   setEmail: (email: string) => void;
   loadSession: (email: string) => Promise<boolean>;
+  login: (email: string, name?: string) => Promise<boolean>;
+  logout: () => void;
   uploadResume: (file: File, jobDescription: string, email: string) => Promise<boolean>;
   clearSession: () => void;
 }
@@ -83,6 +95,7 @@ const CareerContext = createContext<CareerContextType | undefined>(undefined);
 
 export function CareerProvider({ children }: { children: React.ReactNode }) {
   const [email, setEmailState] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
   const [sessionData, setSessionData] = useState<PipelineSessionData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,9 +105,17 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('nexora_user_email');
       const savedSession = localStorage.getItem('nexora_session_data');
+      const savedUser = localStorage.getItem('nexora_user');
       
       if (savedEmail) {
         setEmailState(savedEmail);
+      }
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch (e) {
+          console.warn('Failed to parse cached user data:', e);
+        }
       }
       if (savedSession) {
         try {
@@ -113,6 +134,80 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Login handler
+  const login = async (loginEmail: string, loginName?: string): Promise<boolean> => {
+    if (!loginEmail) return false;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, name: loginName }),
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to login');
+      }
+      
+      const data = await res.json();
+      
+      setUser(data.user);
+      setEmail(loginEmail);
+      
+      if (data.session) {
+        setSessionData(data.session);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('nexora_session_data', JSON.stringify(data.session));
+          // Backward compatibility keys
+          localStorage.setItem('userEmail', loginEmail);
+          localStorage.setItem('atsScore', data.session.ats_score.toString());
+          localStorage.setItem('overallReadiness', data.session.readiness_score.toString());
+          localStorage.setItem('gapPercentage', (100 - (data.session.skills_present.length / (data.session.skills_present.length + data.session.skills_missing.length) * 100)).toString());
+          localStorage.setItem('currentSkills', data.session.skills_present.join(', '));
+          localStorage.setItem('missingSkills', JSON.stringify(data.session.skills_missing.map((s: any) => s.skill_name)));
+          localStorage.setItem('userName', data.user.name);
+          localStorage.setItem('targetRole', data.session.target_role || '');
+        }
+      } else {
+        setSessionData(null);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('nexora_session_data');
+          localStorage.setItem('userEmail', loginEmail);
+          localStorage.setItem('userName', data.user.name);
+          localStorage.removeItem('atsScore');
+          localStorage.removeItem('overallReadiness');
+          localStorage.removeItem('gapPercentage');
+          localStorage.removeItem('currentSkills');
+          localStorage.removeItem('missingSkills');
+          localStorage.removeItem('targetRole');
+        }
+      }
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('nexora_user', JSON.stringify(data.user));
+        localStorage.setItem('nexora_user_email', loginEmail);
+      }
+      return true;
+    } catch (err) {
+      console.error(err);
+      setError((err as Error).message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Logout handler
+  const logout = () => {
+    setUser(null);
+    clearSession();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('nexora_user');
+    }
+  };
+
   // Check if session data exists on backend and load it
   const loadSession = async (searchEmail: string): Promise<boolean> => {
     if (!searchEmail) return false;
@@ -126,7 +221,18 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
       if (data.exists && data.session) {
         setSessionData(data.session);
         setEmail(searchEmail);
+        
+        const parsedName = data.session.name || searchEmail.split('@')[0];
+        const loadedUser: User = {
+          name: parsedName,
+          email: searchEmail,
+          target_role: data.session.target_role,
+          readiness_score: data.session.readiness_score || 0.0
+        };
+        setUser(loadedUser);
+        
         if (typeof window !== 'undefined') {
+          localStorage.setItem('nexora_user', JSON.stringify(loadedUser));
           localStorage.setItem('nexora_session_data', JSON.stringify(data.session));
           // Backward compatibility for pre-existing keys
           localStorage.setItem('userEmail', searchEmail);
@@ -174,7 +280,16 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
       setSessionData(data);
       setEmail(uploadEmail);
       
+      const loadedUser: User = {
+        name: data.name,
+        email: uploadEmail,
+        target_role: data.target_role,
+        readiness_score: data.readiness_score || 0.0
+      };
+      setUser(loadedUser);
+      
       if (typeof window !== 'undefined') {
+        localStorage.setItem('nexora_user', JSON.stringify(loadedUser));
         localStorage.setItem('nexora_session_data', JSON.stringify(data));
         // Backward compatibility keys
         localStorage.setItem('userEmail', uploadEmail);
@@ -200,9 +315,11 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
     setEmailState('');
     setSessionData(null);
     setError(null);
+    setUser(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('nexora_user_email');
       localStorage.removeItem('nexora_session_data');
+      localStorage.removeItem('nexora_user');
       localStorage.removeItem('userEmail');
       localStorage.removeItem('atsScore');
       localStorage.removeItem('overallReadiness');
@@ -218,11 +335,14 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
     <CareerContext.Provider
       value={{
         email,
+        user,
         sessionData,
         loading,
         error,
         setEmail,
         loadSession,
+        login,
+        logout,
         uploadResume,
         clearSession,
       }}

@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
+import AuthGuard from '@/components/AuthGuard';
 import '@/app/globals.css';
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -24,21 +25,23 @@ export default function RootLayout({
       <body className="antialiased bg-background text-white">
         <CareerProvider>
           <TooltipProvider>
-            <div className="flex h-screen bg-background text-white overflow-hidden">
-              {/* Collapsible Sidebar */}
-              <Sidebar />
-              
-              {/* Main Content Area */}
-              <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Sticky Header TopBar */}
-                <TopBar />
+            <AuthGuard>
+              <div className="flex h-screen bg-background text-white overflow-hidden">
+                {/* Collapsible Sidebar */}
+                <Sidebar />
                 
-                {/* Scrollable Dynamic Page Content */}
-                <main className="flex-1 overflow-y-auto p-6 space-y-6">
-                  {children}
-                </main>
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {/* Sticky Header TopBar */}
+                  <TopBar />
+                  
+                  {/* Scrollable Dynamic Page Content */}
+                  <main className="flex-1 overflow-y-auto p-6 space-y-6">
+                    {children}
+                  </main>
+                </div>
               </div>
-            </div>
+            </AuthGuard>
           </TooltipProvider>
         </CareerProvider>
       </body>

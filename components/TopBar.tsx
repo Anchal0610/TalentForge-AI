@@ -1,58 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ChevronRight, LogOut } from 'lucide-react';
+import { useCareer } from '@/components/CareerContext';
 
 export default function TopBar() {
   const pathname = usePathname();
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('Jane Doe');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedEmail = localStorage.getItem('userEmail') || '';
-      setEmail(savedEmail);
-      const savedName = localStorage.getItem('userName') || 'Jane Doe';
-      setName(savedName);
-      
-      const handleStorageChange = () => {
-        setEmail(localStorage.getItem('userEmail') || '');
-        setName(localStorage.getItem('userName') || 'Jane Doe');
-      };
-      
-      window.addEventListener('storage', handleStorageChange);
-      const interval = setInterval(handleStorageChange, 1000);
-      
-      return () => {
-        window.removeEventListener('storage', handleStorageChange);
-        clearInterval(interval);
-      };
-    }
-  }, []);
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setEmail(val);
-    localStorage.setItem('userEmail', val);
-    
-    if (val) {
-      const parsedName = val.split('@')[0];
-      const capitalized = parsedName.charAt(0).toUpperCase() + parsedName.slice(1);
-      setName(capitalized);
-      localStorage.setItem('userName', capitalized);
-    } else {
-      setName('Jane Doe');
-      localStorage.setItem('userName', 'Jane Doe');
-    }
-    
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('storage'));
-    }
-  };
+  const { email, user, logout } = useCareer();
+  
+  const name = user?.name || 'Jane Doe';
 
   const getBreadcrumbLabel = (path: string) => {
     switch (path) {
@@ -81,14 +41,11 @@ export default function TopBar() {
 
       {/* Right Actions */}
       <div className="flex items-center gap-4">
-        {/* Sync Email Input */}
-        <Input
-          type="email"
-          placeholder="Sync email..."
-          value={email}
-          onChange={handleEmailChange}
-          className="w-64 bg-surface border-border text-xs text-white placeholder-muted focus-visible:ring-2 focus-visible:ring-accent h-9"
-        />
+        {/* Logged in email badge */}
+        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800/80 px-3 py-1.5 rounded-lg text-xs text-muted-foreground select-none font-mono">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span>{email}</span>
+        </div>
 
         {/* User Profile + Avatar */}
         <div className="flex items-center gap-3 pl-2 border-l border-border/50">
@@ -110,6 +67,17 @@ export default function TopBar() {
             </AvatarFallback>
           </Avatar>
         </div>
+
+        {/* Logout Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={logout}
+          className="border-zinc-800 hover:bg-red-950/20 hover:text-red-400 hover:border-red-950/30 text-xs h-9 px-3 rounded-lg flex items-center gap-2 transition-all cursor-pointer font-bold uppercase tracking-wider"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Logout</span>
+        </Button>
       </div>
     </header>
   );

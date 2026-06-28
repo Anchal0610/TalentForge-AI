@@ -53,47 +53,24 @@ export default function SkillIntelligencePage() {
 
       {/* 2. No Session State */}
       {!sessionData ? (
-        <Card className="bg-surface border-border p-8 text-center max-w-xl mx-auto space-y-6 mt-10">
-          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto text-accent">
+        <Card className="bg-surface border-border p-8 text-center max-w-xl mx-auto space-y-6 mt-10 shadow-lg">
+          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto text-accent select-none">
             <Network className="w-8 h-8" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-lg font-bold text-white uppercase tracking-wide">No Active Profile Session</h2>
+            <h2 className="text-lg font-bold text-white uppercase tracking-wide">Resume Analysis Required</h2>
             <p className="text-xs text-muted leading-relaxed">
-              Nexora AI needs your parsed capabilities to assemble the Knowledge Graph and compute Three.js projections. Upload your resume or restore a previous session to start.
+              Nexora AI needs your parsed capabilities to assemble the Knowledge Graph and compute Three.js projections. Please upload your resume in the Document Hub to start generating your skill intelligence dashboard.
             </p>
           </div>
 
           <div className="border-t border-border/30 pt-6">
-            <form onSubmit={handleLoginSubmit} className="space-y-3 max-w-sm mx-auto">
-              <div className="space-y-1.5 text-left">
-                <label className="text-[10px] font-bold text-muted uppercase tracking-wider">Email Address</label>
-                <Input
-                  type="email"
-                  required
-                  placeholder="you@example.com"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  className="bg-zinc-950 border-border text-white text-xs h-9"
-                />
-              </div>
-              {errorMsg && (
-                <p className="text-rose-400 text-[11px] font-medium text-left">{errorMsg}</p>
-              )}
+            <Link href="/document-hub">
               <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-white hover:bg-zinc-200 text-black font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded cursor-pointer"
+                className="w-full bg-accent hover:bg-accent-glow text-white font-bold h-9 text-xs uppercase tracking-wider transition-colors rounded cursor-pointer"
               >
-                {loading ? 'Searching...' : 'Restore Session'}
+                Go to Document Hub
               </Button>
-            </form>
-          </div>
-
-          <div className="text-xs text-muted">
-            OR{' '}
-            <Link href="/document-hub" className="text-accent underline font-semibold hover:text-accent-glow">
-              Upload Resume in Document Hub
             </Link>
           </div>
         </Card>
