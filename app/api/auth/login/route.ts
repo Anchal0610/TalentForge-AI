@@ -3,6 +3,9 @@ import { dbManager } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
+    // Ensure database tables exist before querying
+    await dbManager.initDb();
+
     const { email, name } = await request.json();
 
     if (!email) {
