@@ -7,13 +7,12 @@ Nexora AI is a production-ready Career Intelligence Platform designed to transfo
 ---
 
 ## ⚡ Key Capabilities
-1. **Resume Intelligence & ATS Audits**: Scans documents to extract profile nodes, calculating compatibility match indexes.
+1. **Resume & Document Intelligence & ATS Audits**: Scans documents/resumes to extract profile nodes, calculate compatibility match indexes, and processes raw documents using semantic indexing and RAG pipelines for contextual Q&A and summary.
 2. **Career Recommendations**: Suggests matching tech roles and maps market growth curves.
-3. **Skill Gap Analysis**: pinpoints missing technical frameworks and libraries.
-4. **Document Intelligence**: Processes raw text documents using semantic indexing.
-5. **Interview Preparation**: Provides technical questions with tiered answer models.
-6. **3D Vector Embedding Space Explorer**: visualizes semantic proximities between capabilities and job roles.
-7. **Career Knowledge Graphs**: interactive NetworkX maps tracing resources, mock questions, and target requirements.
+3. **Skill Gap Analysis**: Pinpoints missing technical frameworks and libraries.
+4. **Interview Preparation**: Provides technical questions with tiered answer models.
+5. **3D Vector Embedding Space Explorer**: Visualizes semantic proximities between capabilities and job roles.
+6. **Career Knowledge Graphs**: Interactive NetworkX maps tracing resources, mock questions, and target requirements.
 
 ---
 
@@ -28,11 +27,10 @@ Nexora AI is a production-ready Career Intelligence Platform designed to transfo
 │   ├── 1_Resume_Intelligence.py
 │   ├── 2_Career_Advisor.py
 │   ├── 3_Skill_Gap.py
-│   ├── 4_Document_Intelligence.py
-│   ├── 5_Interview_Prep.py
-│   ├── 6_Knowledge_Graph.py
-│   ├── 7_Embedding_Visualization.py
-│   └── 8_Roadmap_and_Readiness.py
+│   ├── 4_Interview_Prep.py
+│   ├── 5_Knowledge_Graph.py
+│   ├── 6_Embedding_Visualization.py
+│   └── 7_Roadmap_and_Readiness.py
 ├── agents/                    # CrewAI Agent Definitions
 │   ├── resume_agent.py
 │   ├── career_agent.py

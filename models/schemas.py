@@ -1,67 +1,63 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict
+import sqlite3
+import hashlib
+import os
 
-class UserProfile(BaseModel):
-    id: Optional[int] = None
-    name: str
-    email: str
-    target_role: Optional[str] = None
-    readiness_score: float = 0.0
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "nexora.db")
 
-class ResumeInsights(BaseModel):
-    ats_score: float = Field(..., description="ATS compatibility score out of 100")
-    skills_extracted: List[str] = Field(..., description="List of skills extracted from resume")
-    experience_summary: str = Field(..., description="Summary of work experience")
-    projects: List[str] = Field(..., description="Key projects mentioned")
-    education: List[str] = Field(..., description="List of degree programs and schools")
-    strengths: List[str] = Field(..., description="Core candidate strengths")
-    weaknesses_improvements: List[str] = Field(..., description="Areas for ATS improvement")
 
-class CareerRecommendation(BaseModel):
-    predicted_roles: List[str] = Field(..., description="Top 3 career path role matches")
-    alignment_reasoning: str = Field(..., description="Reasoning behind role recommendations")
-    growth_trends: Dict[str, str] = Field(..., description="Market growth/demand trends for predicted roles")
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
-class SkillGapItem(BaseModel):
-    skill_name: str
-    current_proficiency: str = Field(..., description="e.g., None, Beginner, Intermediate")
-    required_proficiency: str = Field(..., description="Required proficiency level for target role")
-    estimated_learning_hours: int = Field(..., description="Estimated study time required to close the gap")
-    priority: str = Field(..., description="Learning priority: High, Medium, Low")
 
-class SkillGapAnalysis(BaseModel):
-    target_role: str
-    gaps: List[SkillGapItem]
-    overall_gap_percentage: float = Field(..., description="Percentage of target role skills currently missing")
+def init_user_table():
+    conn = get_db()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT,
+            name TEXT,
+            picture TEXT,
+            auth_provider TEXT DEFAULT 'email',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    conn.close()
 
-class RoadmapStep(BaseModel):
-    week: int = Field(..., description="Week number")
-    topic: str = Field(..., description="Core subject or technology to learn")
-    resources: List[str] = Field(..., description="Recommended blogs, docs, courses")
-    project_milestone: str = Field(..., description="Mini project milestone to build")
-    certification_suggestion: Optional[str] = None
 
-class LearningRoadmap(BaseModel):
-    target_role: str
-    weekly_plan: List[RoadmapStep]
-    estimated_completion_weeks: int
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
-class InterviewQuestion(BaseModel):
-    id: int
-    question: str
-    category: str = Field(..., description="Technical, HR, Company-Specific")
-    difficulty: str = Field(..., description="Easy, Medium, Hard")
 
-class InterviewAnswer(BaseModel):
-    question_id: int
-    beginner_answer: str
-    intermediate_answer: str
-    expert_answer: str
-    keywords: List[str] = Field(..., description="Essential terms that must be mentioned")
+def create_user(email, password=None, name=None, picture=None, auth_provider="email"):
+    conn = get_db()
+    try:
+        hashed = hash_password(password) if password else None
+        conn.execute(
+            "INSERT INTO users (email, password, name, picture, auth_provider) VALUES (?, ?, ?, ?, ?)",
+            (email, hashed, name, picture, auth_provider),
+        )
+        conn.commit()
+        user_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+        return user_id
+    except sqlite3.IntegrityError:
+        return None
+    finally:
+        conn.close()
 
-class CareerReadiness(BaseModel):
-    overall_percentage: float = Field(..., description="Overall readiness from 0.0 to 100.0")
-    profile_strength: float = Field(..., description="Resume & ATS score metric weight")
-    skill_match_strength: float = Field(..., description="Target role skill fit weight")
-    mock_interview_strength: float = Field(..., description="Mock interview performance weight")
-    next_steps: List[str] = Field(..., description="Prioritized recommendations to become job-ready")
+
+def get_user_by_email(email):
+    conn = get_db()
+    user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    conn.close()
+    return dict(user) if user else None
+
+
+def verify_user(email, password):
+    user = get_user_by_email(email)
+    if user and user["password"] == hash_password(password):
+        return user
+    return None

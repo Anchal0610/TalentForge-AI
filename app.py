@@ -6,6 +6,16 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from database.connection import init_db
+from services.auth import (
+    handle_oauth_redirect,
+    login_button,
+    login_with_email,
+    register_with_email,
+    logout,
+    is_logged_in,
+    get_user,
+    is_configured as auth_configured,
+)
 from utils.logger import logger
 
 # Initialize database on application start
@@ -21,6 +31,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Handle OAuth redirect callback
+handle_oauth_redirect()
 
 # Custom CSS for Next-Gen Aesthetic (Glassmorphism + Dark Mode + Neon Accents)
 st.markdown("""
@@ -92,6 +105,68 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Sidebar with authentication
+with st.sidebar:
+    st.markdown("### ⚡ Nexora AI")
+    st.divider()
+    if is_logged_in():
+        user = get_user()
+        st.markdown(f"**Welcome, {user.get('name', 'User')}**")
+        if user.get("picture"):
+            st.image(user["picture"], width=60)
+        st.caption(f"_{user.get('email', '')}_")
+        if st.button("🚪 Sign Out", use_container_width=True):
+            logout()
+            st.rerun()
+    else:
+        st.markdown("#### Sign In")
+        method = st.radio("Login method", ["Google", "Email"], horizontal=True, label_visibility="collapsed")
+
+        if method == "Google":
+            login_button()
+            if not auth_configured():
+                st.caption("Configure Google OAuth in .env")
+        else:
+            with st.form("login_form"):
+                email = st.text_input("Email", placeholder="you@example.com")
+                password = st.text_input("Password", type="password", placeholder="••••••••")
+                col1, col2 = st.columns(2)
+                with col1:
+                    submitted = st.form_submit_button("Sign In", use_container_width=True)
+                with col2:
+                    register = st.form_submit_button("Register", use_container_width=True)
+
+            if submitted:
+                if email and password:
+                    if login_with_email(email, password):
+                        st.rerun()
+                    else:
+                        st.error("Invalid email or password")
+                else:
+                    st.warning("Please enter email and password")
+
+            if register:
+                if email and password:
+                    name = email.split("@")[0]
+                    success, msg = register_with_email(email, password, name)
+                    if success:
+                        st.rerun()
+                    else:
+                        st.error(msg)
+                else:
+                    st.warning("Please enter email and password")
+    st.divider()
+    st.page_link("app.py", label="🏠 Home", icon=None)
+    st.page_link("pages/1_Resume_Intelligence.py", label="📄 Resume ATS", icon=None)
+    st.page_link("pages/2_Career_Advisor.py", label="🎯 Career Advisor", icon=None)
+    st.page_link("pages/3_Skill_Gap.py", label="📊 Skill Gap", icon=None)
+    st.page_link("pages/4_Document_Intelligence.py", label="📚 Document RAG", icon=None)
+    st.page_link("pages/5_Interview_Prep.py", label="🎤 Interview Prep", icon=None)
+    st.page_link("pages/6_Knowledge_Graph.py", label="🕸️ Knowledge Graph", icon=None)
+    st.page_link("pages/7_Embedding_Visualization.py", label="🔮 Embeddings", icon=None)
+    st.page_link("pages/8_Roadmap_and_Readiness.py", label="🗺️ Roadmap", icon=None)
+    st.page_link("pages/9_Admin_Dashboard.py", label="⚙️ Admin", icon=None)
+
 # App Header
 st.markdown("""
 <div style='text-align: center; margin-top: 2rem; margin-bottom: 3rem;'>
@@ -116,10 +191,9 @@ with col1:
         <div style="margin-top: 1.5rem;">
             <p style="color: #E2E8F0; font-weight: 600; margin-bottom: 0.5rem;">🚀 Available Modules:</p>
             <ul style="color: #94A3B8; line-height: 1.8; padding-left: 20px;">
-                <li><b>Resume Intelligence & ATS Analysis</b>: Check resume match rates and optimization items.</li>
+                <li><b>Resume & Document Intelligence</b>: Analyze resume compatibility, parse and index documents, run semantic RAG queries, and extract summaries.</li>
                 <li><b>Career Advisor & Recommendations</b>: Discover top titles and market growth insights.</li>
                 <li><b>Skill Gap Analysis</b>: Detailed checklist of missing libraries, tools, and algorithms.</li>
-                <li><b>Document Intelligence</b>: Summarize documents and auto-extract core exam concepts.</li>
                 <li><b>Interview Prep Suite</b>: Tiered answers (Beginner to Expert) and interactive mock evaluations.</li>
                 <li><b>3D Vector & Knowledge Graph Explorers</b>: Interact with skills mapped to job clusters.</li>
             </ul>

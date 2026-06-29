@@ -1,20 +1,21 @@
 version: '3.8'
 
 services:
-  # Nexora AI Streamlit Web Application
+  # Nexora AI Next.js Application
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: nexora_app
     ports:
-      - "8501:8501"
+      - "3000:3000"
     environment:
       - MISTRAL_API_KEY=${MISTRAL_API_KEY}
       - MISTRAL_MODEL_NAME=${MISTRAL_MODEL_NAME:-mistral-large-latest}
       - PINECONE_API_KEY=${PINECONE_API_KEY}
       - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME:-nexora-career-index}
       - DATABASE_URL=${DATABASE_URL}
-    volumes:
-      - ./logs:/app/logs
+      - IMAGEKIT_PUBLIC_KEY=${IMAGEKIT_PUBLIC_KEY}
+      - IMAGEKIT_PRIVATE_KEY=${IMAGEKIT_PRIVATE_KEY}
+      - IMAGEKIT_URL_ENDPOINT=${IMAGEKIT_URL_ENDPOINT}
     restart: unless-stopped
