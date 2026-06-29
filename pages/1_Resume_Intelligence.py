@@ -3,6 +3,7 @@ import os
 from services.mistral_ocr import mistral_ocr_service
 from services.ats_service import ats_service
 from services.imagekit_service import imagekit_service
+from services.auth import is_logged_in, get_user
 from database.connection import db_manager
 from rag.chunking import document_chunker
 from rag.vector_store import vector_store
@@ -38,6 +39,7 @@ tab1, tab2 = st.tabs(["📄 ATS Diagnostics", "📚 Document RAG & Summary"])
 with tab1:
     col1, col2 = st.columns(2)
     
+<<<<<<< HEAD
     with col1:
         st.subheader("Upload Resume")
         uploaded_file = st.file_uploader("Drop your resume file here", type=["pdf", "docx", "pptx", "txt"], key="resume_uploader")
@@ -48,6 +50,16 @@ with tab1:
         job_description = st.text_area("Paste the job posting description here", height=250, placeholder="We are looking for a Senior Software Engineer skilled in Python, Docker, Qdrant...", key="job_desc")
         
         index_resume_db = st.checkbox("Index resume in vector database for semantic Q&A and summary", value=True)
+=======
+    if is_logged_in():
+        user_email = get_user().get("email", "")
+        st.success(f"Signed in as **{user_email}**")
+    else:
+        user_email = st.text_input("Your Email (to save results)", placeholder="you@example.com")
+    
+    st.subheader("Target Job Description")
+    job_description = st.text_area("Paste the job posting description here", height=250, placeholder="We are looking for a Senior Software Engineer skilled in Python, Docker, Qdrant...")
+>>>>>>> 124b706244bf91fbacf15dd9bcd63879be3df928
 
     with col2:
         st.subheader("Analysis Results")
