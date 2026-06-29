@@ -91,6 +91,7 @@ interface CareerContextType {
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
   clearSession: () => void;
+  clearSessionData: () => void;
 }
 
 const CareerContext = createContext<CareerContextType | undefined>(undefined);
@@ -314,6 +315,20 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const clearSessionData = () => {
+    setSessionData(null);
+    setError(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('nexora_session_data');
+      localStorage.removeItem('atsScore');
+      localStorage.removeItem('overallReadiness');
+      localStorage.removeItem('gapPercentage');
+      localStorage.removeItem('currentSkills');
+      localStorage.removeItem('missingSkills');
+      localStorage.removeItem('targetRole');
+    }
+  };
+
   const clearSession = () => {
     setEmailState('');
     setSessionData(null);
@@ -348,6 +363,7 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
         logout,
         uploadResume,
         clearSession,
+        clearSessionData,
         mobileMenuOpen,
         setMobileMenuOpen,
       }}

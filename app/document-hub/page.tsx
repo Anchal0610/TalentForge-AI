@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 export default function DocumentHubPage() {
-  const { email: loggedInEmail, sessionData, loading, error, uploadResume, loadSession, clearSession } = useCareer();
+  const { email: loggedInEmail, sessionData, loading, error, uploadResume, loadSession, clearSession, clearSessionData } = useCareer();
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState('');
   const [email, setEmail] = useState('');
@@ -163,10 +163,10 @@ export default function DocumentHubPage() {
         {sessionData && (
           <Button 
             variant="outline" 
-            onClick={clearSession}
-            className="text-xs border-border hover:bg-surface-2 text-white h-8 shrink-0 cursor-pointer"
+            onClick={clearSessionData}
+            className="text-xs border-border hover:bg-surface-2 text-white h-8 shrink-0 cursor-pointer flex items-center gap-1.5"
           >
-            <RefreshCw className="w-3.5 h-3.5 mr-1" /> Reset Session
+            <Upload className="w-3.5 h-3.5 text-accent" /> Upload New Resume
           </Button>
         )}
       </div>
