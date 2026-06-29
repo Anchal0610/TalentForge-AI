@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root, .dark {
+  /* Design Tokens as CSS Variables for shadcn integration */
+  --background: #09090B;
+  --foreground: #FFFFFF;
+  
+  --card: #18181B;
+  --card-foreground: #FFFFFF;
+  
+  --popover: #18181B;
+  --popover-foreground: #FFFFFF;
+  
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  
+  --secondary: #27272A;
+  --secondary-foreground: #FFFFFF;
+  
+  --muted: #27272A;
+  --muted-foreground: #71717A;
+  
+  --accent: #27272A;
+  --accent-foreground: #FFFFFF;
+  
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  
+  --border: #3F3F46;
+  --input: #18181B;
+  --ring: #3B82F6;
+  --radius: 0.5rem;
+  
+  --sidebar: #18181B;
+  --sidebar-foreground: #71717A;
+  --sidebar-primary: #3B82F6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #27272A;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #3F3F46;
+  --sidebar-ring: #3B82F6;
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Custom Design Tokens requested */
+  --color-background: #09090B;
+  --color-surface: #18181B;
+  --color-surface-2: #27272A;
+  --color-border: #3F3F46;
+  --color-accent: #3B82F6;
+  --color-accent-glow: #1D4ED8;
+  --color-cyan: #06B6D4;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-muted: #71717A;
+
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+    background-color: #09090B;
+    color: #FFFFFF;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+
+  /* Selection style: bg-accent/30 */
+  ::selection {
+    background-color: rgba(59, 130, 246, 0.3);
+    color: #FFFFFF;
+  }
+
+  /* Placeholder style: text-zinc-600 */
+  ::placeholder {
+    color: #52525B !important; /* zinc-600 */
+  }
+
+  /* Custom scrollbar: thin, zinc-700 track, accent thumb */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #18181B; /* surface */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #3F3F46; /* border (zinc-700) */
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3B82F6; /* accent */
+  }
+}
