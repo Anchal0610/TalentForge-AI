@@ -50,7 +50,11 @@ class DatabaseManager {
   constructor() {
     this.dbUrl = (process.env.DATABASE_URL || '').trim();
     this.usePrisma = this.dbUrl.startsWith('mongodb') || this.dbUrl.includes('mongodb');
-    this.jsonDbPath = path.join(process.cwd(), 'nexora_db.json');
+    
+    const isServerless = !!process.env.VERCEL || !!process.env.LAMBDA_TASK_ROOT || process.env.NODE_ENV === 'production';
+    this.jsonDbPath = isServerless 
+      ? path.join('/tmp', 'nexora_db.json') 
+      : path.join(process.cwd(), 'nexora_db.json');
   }
 
   // Read Local JSON DB

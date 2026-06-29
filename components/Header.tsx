@@ -68,7 +68,7 @@ export default function Header() {
     <header className="h-16 border-b border-zinc-850 bg-black flex items-center justify-between px-8 z-40 sticky top-0 w-full">
       <div>
         <h2 className="text-sm font-bold tracking-tight text-white uppercase">
-          {getPageTitle(pathname)}
+          {getPageTitle(pathname || '')}
         </h2>
       </div>
 

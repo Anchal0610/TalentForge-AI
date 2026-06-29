@@ -36,7 +36,7 @@ export default function TopBar() {
       <div className="flex items-center gap-1.5 text-xs text-muted font-medium select-none">
         <span className="hover:text-white transition-colors cursor-pointer">Nexora AI</span>
         <ChevronRight className="w-3.5 h-3.5 text-muted/50" />
-        <span className="text-white font-semibold">{getBreadcrumbLabel(pathname)}</span>
+        <span className="text-white font-semibold">{getBreadcrumbLabel(pathname || '')}</span>
       </div>
 
       {/* Right Actions */}
