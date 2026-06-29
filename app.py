@@ -9,6 +9,8 @@ from database.connection import init_db
 from services.auth import (
     handle_oauth_redirect,
     login_button,
+    login_with_email,
+    register_with_email,
     logout,
     is_logged_in,
     get_user,
@@ -118,9 +120,41 @@ with st.sidebar:
             st.rerun()
     else:
         st.markdown("#### Sign In")
-        login_button()
-        if not auth_configured():
-            st.caption("Configure Google OAuth in .env")
+        method = st.radio("Login method", ["Google", "Email"], horizontal=True, label_visibility="collapsed")
+
+        if method == "Google":
+            login_button()
+            if not auth_configured():
+                st.caption("Configure Google OAuth in .env")
+        else:
+            with st.form("login_form"):
+                email = st.text_input("Email", placeholder="you@example.com")
+                password = st.text_input("Password", type="password", placeholder="••••••••")
+                col1, col2 = st.columns(2)
+                with col1:
+                    submitted = st.form_submit_button("Sign In", use_container_width=True)
+                with col2:
+                    register = st.form_submit_button("Register", use_container_width=True)
+
+            if submitted:
+                if email and password:
+                    if login_with_email(email, password):
+                        st.rerun()
+                    else:
+                        st.error("Invalid email or password")
+                else:
+                    st.warning("Please enter email and password")
+
+            if register:
+                if email and password:
+                    name = email.split("@")[0]
+                    success, msg = register_with_email(email, password, name)
+                    if success:
+                        st.rerun()
+                    else:
+                        st.error(msg)
+                else:
+                    st.warning("Please enter email and password")
     st.divider()
     st.page_link("app.py", label="🏠 Home", icon=None)
     st.page_link("pages/1_Resume_Intelligence.py", label="📄 Resume ATS", icon=None)
