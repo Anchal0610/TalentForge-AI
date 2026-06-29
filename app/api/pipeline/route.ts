@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { ocrService } from '@/lib/ocr';
 import { imagekitService } from '@/lib/imagekit';
 import { mistralService } from '@/lib/mistral';
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
     const email = (inputEmail || 'guest@nexora.ai').trim();
 
     // 1. Temp file extraction & OCR
-    const tempDir = path.join(process.cwd(), 'temp');
+    const tempDir = path.join(os.tmpdir(), 'talentforge-temp');
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
     }
@@ -393,7 +394,7 @@ export async function POST(request: Request) {
         chunk_index: i
       }));
       await pineconeService.upsertChunks(chunks, embeddings, metadatas);
-      await dbManager.saveDocument(file.name, fileUrl || undefined, chunks.length);
+      await dbManager.saveDocument(file.name, chunks, fileUrl || undefined);
     }
 
     // 9. Knowledge Graph JSON Structure

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { ocrService } from '@/lib/ocr';
 import { imagekitService } from '@/lib/imagekit';
 import { mistralService } from '@/lib/mistral';
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Write to temp file path
-    const tempDir = path.join(process.cwd(), 'temp');
+    const tempDir = path.join(os.tmpdir(), 'talentforge-temp');
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
     }
@@ -80,7 +81,7 @@ export async function POST(request: Request) {
     await pineconeService.upsertChunks(chunks, embeddings, metadatas);
 
     // 8. Save document to Database log
-    await dbManager.saveDocument(file.name, fileUrl || undefined, chunks.length);
+    await dbManager.saveDocument(file.name, chunks, fileUrl || undefined);
 
     return NextResponse.json({
       success: true,

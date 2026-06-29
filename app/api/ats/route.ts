@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { ocrService } from '@/lib/ocr';
 import { imagekitService } from '@/lib/imagekit';
 import { mistralService } from '@/lib/mistral';
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Create a temp file path and write buffer
-    const tempDir = path.join(process.cwd(), 'temp');
+    const tempDir = path.join(os.tmpdir(), 'talentforge-temp');
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, { recursive: true });
     }

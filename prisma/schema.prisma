@@ -33,11 +33,21 @@ model Resume {
 }
 
 model Document {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
   filename    String
   file_url    String?
-  chunk_count Int      @default(0)
-  created_at  DateTime @default(now())
+  chunk_count Int             @default(0)
+  created_at  DateTime        @default(now())
+  chunks      DocumentChunk[]
+}
+
+model DocumentChunk {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  document_id  String   @db.ObjectId
+  document     Document @relation(fields: [document_id], references: [id], onDelete: Cascade)
+  chunk_index  Int
+  text_content String
+  created_at   DateTime @default(now())
 }
 
 model MockInterview {
