@@ -66,7 +66,7 @@ model PipelineSession {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   email      String   @unique
   user       User     @relation(fields: [email], references: [email], onDelete: Cascade)
-  data       Json     // Stores the full unified pipeline result JSON
+  data       Json
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
