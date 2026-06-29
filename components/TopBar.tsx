@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, LogOut } from 'lucide-react';
+import { ChevronRight, LogOut, Menu } from 'lucide-react';
 import { useCareer } from '@/components/CareerContext';
 
 export default function TopBar() {
   const pathname = usePathname();
-  const { email, user, logout } = useCareer();
+  const { email, user, logout, setMobileMenuOpen } = useCareer();
   
   const name = user?.name || 'Jane Doe';
 
@@ -31,12 +31,23 @@ export default function TopBar() {
   };
 
   return (
-    <header className="h-16 bg-background/80 backdrop-blur border-b border-border flex items-center justify-between px-6 z-40 sticky top-0 w-full shrink-0">
-      {/* Left: Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-xs text-muted font-medium select-none">
-        <span className="hover:text-white transition-colors cursor-pointer">Nexora AI</span>
-        <ChevronRight className="w-3.5 h-3.5 text-muted/50" />
-        <span className="text-white font-semibold">{getBreadcrumbLabel(pathname || '')}</span>
+    <header className="h-16 bg-background/80 backdrop-blur border-b border-border flex items-center justify-between px-6 z-45 sticky top-0 w-full shrink-0">
+      {/* Left: Breadcrumb & Mobile Menu Trigger */}
+      <div className="flex items-center gap-3">
+        {/* Mobile Hamburger Trigger */}
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open navigation menu"
+          className="md:hidden p-1.5 rounded-lg text-muted hover:text-white hover:bg-zinc-900/50 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-accent border border-transparent"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        <div className="flex items-center gap-1.5 text-xs text-muted font-medium select-none">
+          <span className="hidden sm:inline hover:text-white transition-colors cursor-pointer">Nexora AI</span>
+          <ChevronRight className="hidden sm:inline w-3.5 h-3.5 text-muted/50" />
+          <span className="text-white font-semibold">{getBreadcrumbLabel(pathname || '')}</span>
+        </div>
       </div>
 
       {/* Right Actions */}

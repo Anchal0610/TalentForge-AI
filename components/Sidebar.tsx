@@ -19,9 +19,11 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useCareer } from '@/components/CareerContext';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { mobileMenuOpen, setMobileMenuOpen } = useCareer();
   
   // Initialize collapsed state from localStorage if available
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -59,12 +61,26 @@ export default function Sidebar() {
   }
 
   return (
-    <aside
-      className={cn(
-        "h-screen flex flex-col justify-between bg-surface border-r border-border transition-all duration-300 ease-in-out shrink-0 select-none z-50",
-        isCollapsed ? "w-16" : "w-60"
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-45 md:hidden animate-fade-in"
+        />
       )}
-    >
+
+      <aside
+        className={cn(
+          "bg-surface border-r border-border flex flex-col justify-between transition-all duration-300 ease-in-out shrink-0 select-none z-50",
+          // Mobile drawer vs Desktop sticky column
+          "fixed top-0 bottom-0 left-0 md:sticky md:h-screen",
+          // Drawer transition on mobile, reset on desktop
+          mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+          // Mobile width is always 60, desktop collapses dynamically
+          isCollapsed ? "w-60 md:w-16" : "w-60"
+        )}
+      >
       <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         {/* Header / Brand Logo */}
         <div className={cn(
@@ -88,6 +104,7 @@ export default function Sidebar() {
               const linkContent = (
                 <Link
                   href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-3 py-2.5 px-3 text-xs tracking-wide uppercase font-semibold transition-all duration-150 relative group outline-none focus-visible:ring-2 focus-visible:ring-accent",
                     isActive
@@ -148,5 +165,6 @@ export default function Sidebar() {
         </button>
       </div>
     </aside>
+    </>
   );
 }

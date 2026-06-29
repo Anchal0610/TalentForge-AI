@@ -88,6 +88,8 @@ interface CareerContextType {
   login: (email: string, name?: string) => Promise<boolean>;
   logout: () => void;
   uploadResume: (file: File, jobDescription: string, email: string) => Promise<boolean>;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
   clearSession: () => void;
 }
 
@@ -99,6 +101,7 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
   const [sessionData, setSessionData] = useState<PipelineSessionData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -345,6 +348,8 @@ export function CareerProvider({ children }: { children: React.ReactNode }) {
         logout,
         uploadResume,
         clearSession,
+        mobileMenuOpen,
+        setMobileMenuOpen,
       }}
     >
       {children}
