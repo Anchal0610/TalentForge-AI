@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -8,32 +8,32 @@ generator client {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
   name            String
-  email           String    @unique
+  email           String            @unique
   target_role     String?
-  readiness_score Float     @default(0.0)
-  created_at      DateTime  @default(now())
+  readiness_score Float             @default(0.0)
+  created_at      DateTime          @default(now())
   resumes         Resume[]
   interviews      MockInterview[]
   sessions        PipelineSession[]
 }
 
 model Resume {
-  id             Int       @id @default(autoincrement())
-  user_id        Int
-  user           User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  filename       String
-  file_url       String?
-  raw_text       String
-  ats_score      Float
-  skills_json    Json?
-  insights_json  Json?
-  created_at     DateTime  @default(now())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id       String   @db.ObjectId
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  filename      String
+  file_url      String?
+  raw_text      String
+  ats_score     Float
+  skills_json   Json?
+  insights_json Json?
+  created_at    DateTime @default(now())
 }
 
 model Document {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   filename    String
   file_url    String?
   chunk_count Int      @default(0)
@@ -41,8 +41,8 @@ model Document {
 }
 
 model MockInterview {
-  id             Int      @id @default(autoincrement())
-  user_id        Int
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id        String   @db.ObjectId
   user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   topic          String
   role           String
@@ -53,10 +53,10 @@ model MockInterview {
 }
 
 model PipelineSession {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  user        User     @relation(fields: [email], references: [email], onDelete: Cascade)
-  data        Json     // Stores the full unified pipeline result JSON
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  email      String   @unique
+  user       User     @relation(fields: [email], references: [email], onDelete: Cascade)
+  data       Json     // Stores the full unified pipeline result JSON
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }

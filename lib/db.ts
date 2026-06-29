@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { Client } from 'pg';
+import { prisma } from './prisma';
 
 export interface User {
-  id?: number;
+  id?: string | number;
   name: string;
   email: string;
   target_role?: string;
@@ -12,8 +12,8 @@ export interface User {
 }
 
 export interface Resume {
-  id?: number;
-  user_id: number;
+  id?: string | number;
+  user_id: string | number;
   filename: string;
   file_url?: string;
   raw_text: string;
@@ -24,7 +24,7 @@ export interface Resume {
 }
 
 export interface DocumentRecord {
-  id?: number;
+  id?: string | number;
   filename: string;
   file_url?: string;
   chunk_count: number;
@@ -32,8 +32,8 @@ export interface DocumentRecord {
 }
 
 export interface MockInterview {
-  id?: number;
-  user_id: number;
+  id?: string | number;
+  user_id: string | number;
   topic: string;
   role: string;
   questions_json: string;
@@ -43,29 +43,14 @@ export interface MockInterview {
 }
 
 class DatabaseManager {
-  private usePostgres = false;
+  private usePrisma = false;
   private dbUrl = '';
   private jsonDbPath = '';
 
   constructor() {
     this.dbUrl = (process.env.DATABASE_URL || '').trim();
-    this.usePostgres = this.dbUrl.startsWith('postgresql://') || this.dbUrl.startsWith('postgres://');
+    this.usePrisma = this.dbUrl.startsWith('mongodb') || this.dbUrl.includes('mongodb');
     this.jsonDbPath = path.join(process.cwd(), 'nexora_db.json');
-  }
-
-  private async getPostgresClient(): Promise<Client | null> {
-    if (!this.usePostgres) return null;
-    const client = new Client({
-      connectionString: this.dbUrl,
-      ssl: this.dbUrl.includes('sslmode=require') ? { rejectUnauthorized: false } : false,
-    });
-    try {
-      await client.connect();
-      return client;
-    } catch (err) {
-      console.error('Failed to connect to PostgreSQL. Falling back to local JSON database.', err);
-      return null;
-    }
   }
 
   // Read Local JSON DB
@@ -100,69 +85,13 @@ class DatabaseManager {
   }
 
   public async initDb() {
-    console.log('Initializing Database tables...');
-    const pg = await this.getPostgresClient();
-    
-    if (pg) {
+    console.log('Initializing Database connection...');
+    if (this.usePrisma) {
       try {
-        await pg.query(`
-          CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) UNIQUE,
-            target_role VARCHAR(255),
-            readiness_score REAL DEFAULT 0.0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          )
-        `);
-        await pg.query(`
-          CREATE TABLE IF NOT EXISTS resumes (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            filename VARCHAR(255),
-            file_url TEXT,
-            raw_text TEXT,
-            ats_score REAL,
-            skills_json JSONB,
-            insights_json JSONB,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          )
-        `);
-        await pg.query(`
-          CREATE TABLE IF NOT EXISTS documents (
-            id SERIAL PRIMARY KEY,
-            filename VARCHAR(255),
-            file_url TEXT,
-            chunk_count INTEGER DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          )
-        `);
-        await pg.query(`
-          CREATE TABLE IF NOT EXISTS mock_interviews (
-            id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            topic VARCHAR(255),
-            role VARCHAR(255),
-            questions_json JSONB,
-            answers_json JSONB,
-            score REAL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          )
-        `);
-        await pg.query(`
-          CREATE TABLE IF NOT EXISTS pipeline_sessions (
-            id SERIAL PRIMARY KEY,
-            email VARCHAR(255) UNIQUE NOT NULL,
-            data JSONB NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          )
-        `);
-        console.log('PostgreSQL schema initialized successfully.');
+        await prisma.$connect();
+        console.log('MongoDB (via Prisma) connection initialized successfully.');
       } catch (err) {
-        console.error('PostgreSQL initialization error:', err);
-      } finally {
-        await pg.end();
+        console.error('MongoDB connection error:', err);
       }
     } else {
       // Local JSON DB Init
@@ -172,20 +101,33 @@ class DatabaseManager {
   }
 
   public async saveUser(name: string, email: string, targetRole: string, readinessScore: number): Promise<User> {
-    const pg = await this.getPostgresClient();
-    if (pg) {
+    if (this.usePrisma) {
       try {
-        const query = `
-          INSERT INTO users (name, email, target_role, readiness_score) 
-          VALUES ($1, $2, $3, $4)
-          ON CONFLICT (email) 
-          DO UPDATE SET name = EXCLUDED.name, target_role = EXCLUDED.target_role, readiness_score = EXCLUDED.readiness_score
-          RETURNING *
-        `;
-        const res = await pg.query(query, [name, email, targetRole, readinessScore]);
-        return res.rows[0];
-      } finally {
-        await pg.end();
+        const user = await prisma.user.upsert({
+          where: { email },
+          update: {
+            name,
+            target_role: targetRole,
+            readiness_score: readinessScore,
+          },
+          create: {
+            name,
+            email,
+            target_role: targetRole,
+            readiness_score: readinessScore,
+          },
+        });
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          target_role: user.target_role || undefined,
+          readiness_score: user.readiness_score,
+          created_at: user.created_at.toISOString(),
+        };
+      } catch (err) {
+        console.error('Error saving user via Prisma:', err);
+        throw err;
       }
     } else {
       const data = this.readJsonDb();
@@ -195,7 +137,7 @@ class DatabaseManager {
         user.target_role = targetRole;
         user.readiness_score = readinessScore;
       } else {
-        const nextId = data.users.length > 0 ? Math.max(...data.users.map(u => u.id || 0)) + 1 : 1;
+        const nextId = data.users.length > 0 ? Math.max(...data.users.map(u => Number(u.id) || 0)) + 1 : 1;
         user = {
           id: nextId,
           name,
@@ -212,13 +154,23 @@ class DatabaseManager {
   }
 
   public async getUser(email: string): Promise<User | null> {
-    const pg = await this.getPostgresClient();
-    if (pg) {
+    if (this.usePrisma) {
       try {
-        const res = await pg.query('SELECT * FROM users WHERE email = $1', [email]);
-        return res.rows[0] || null;
-      } finally {
-        await pg.end();
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
+        if (!user) return null;
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          target_role: user.target_role || undefined,
+          readiness_score: user.readiness_score,
+          created_at: user.created_at.toISOString(),
+        };
+      } catch (err) {
+        console.error('Error getting user via Prisma:', err);
+        throw err;
       }
     } else {
       const data = this.readJsonDb();
@@ -227,23 +179,34 @@ class DatabaseManager {
     }
   }
 
-  public async saveResume(userId: number, filename: string, rawText: string, atsScore: number, fileUrl?: string): Promise<Resume> {
-    const pg = await this.getPostgresClient();
-    if (pg) {
+  public async saveResume(userId: string | number, filename: string, rawText: string, atsScore: number, fileUrl?: string): Promise<Resume> {
+    if (this.usePrisma) {
       try {
-        const query = `
-          INSERT INTO resumes (user_id, filename, file_url, raw_text, ats_score) 
-          VALUES ($1, $2, $3, $4, $5)
-          RETURNING *
-        `;
-        const res = await pg.query(query, [userId, filename, fileUrl || null, rawText, atsScore]);
-        return res.rows[0];
-      } finally {
-        await pg.end();
+        const resume = await prisma.resume.create({
+          data: {
+            user_id: String(userId),
+            filename,
+            raw_text: rawText,
+            ats_score: atsScore,
+            file_url: fileUrl || null,
+          },
+        });
+        return {
+          id: resume.id,
+          user_id: resume.user_id,
+          filename: resume.filename,
+          file_url: resume.file_url || undefined,
+          raw_text: resume.raw_text,
+          ats_score: resume.ats_score,
+          created_at: resume.created_at.toISOString(),
+        };
+      } catch (err) {
+        console.error('Error saving resume via Prisma:', err);
+        throw err;
       }
     } else {
       const data = this.readJsonDb();
-      const nextId = data.resumes.length > 0 ? Math.max(...data.resumes.map(r => r.id || 0)) + 1 : 1;
+      const nextId = data.resumes.length > 0 ? Math.max(...data.resumes.map(r => Number(r.id) || 0)) + 1 : 1;
       const resume: Resume = {
         id: nextId,
         user_id: userId,
@@ -260,22 +223,29 @@ class DatabaseManager {
   }
 
   public async saveDocument(filename: string, fileUrl?: string, chunkCount = 0): Promise<DocumentRecord> {
-    const pg = await this.getPostgresClient();
-    if (pg) {
+    if (this.usePrisma) {
       try {
-        const query = `
-          INSERT INTO documents (filename, file_url, chunk_count) 
-          VALUES ($1, $2, $3)
-          RETURNING *
-        `;
-        const res = await pg.query(query, [filename, fileUrl || null, chunkCount]);
-        return res.rows[0];
-      } finally {
-        await pg.end();
+        const doc = await prisma.document.create({
+          data: {
+            filename,
+            file_url: fileUrl || null,
+            chunk_count: chunkCount,
+          },
+        });
+        return {
+          id: doc.id,
+          filename: doc.filename,
+          file_url: doc.file_url || undefined,
+          chunk_count: doc.chunk_count,
+          created_at: doc.created_at.toISOString(),
+        };
+      } catch (err) {
+        console.error('Error saving document via Prisma:', err);
+        throw err;
       }
     } else {
       const data = this.readJsonDb();
-      const nextId = data.documents.length > 0 ? Math.max(...data.documents.map(d => d.id || 0)) + 1 : 1;
+      const nextId = data.documents.length > 0 ? Math.max(...data.documents.map(d => Number(d.id) || 0)) + 1 : 1;
       const doc: DocumentRecord = {
         id: nextId,
         filename,
@@ -291,7 +261,7 @@ class DatabaseManager {
 
   public async getDiagnostics() {
     const data = {
-      databaseType: this.usePostgres ? 'PostgreSQL (Neon)' : 'Local JSON Fallback',
+      databaseType: this.usePrisma ? 'MongoDB (Prisma)' : 'Local JSON Fallback',
       usersCount: 0,
       resumesCount: 0,
       documentsCount: 0,
@@ -299,22 +269,21 @@ class DatabaseManager {
       dbHealthy: false,
     };
 
-    const pg = await this.getPostgresClient();
-    if (pg) {
+    if (this.usePrisma) {
       try {
-        const u = await pg.query('SELECT COUNT(*) FROM users');
-        const r = await pg.query('SELECT COUNT(*) FROM resumes');
-        const d = await pg.query('SELECT COUNT(*) FROM documents');
-        const m = await pg.query('SELECT COUNT(*) FROM mock_interviews');
-        data.usersCount = parseInt(u.rows[0].count, 10);
-        data.resumesCount = parseInt(r.rows[0].count, 10);
-        data.documentsCount = parseInt(d.rows[0].count, 10);
-        data.mockInterviewsCount = parseInt(m.rows[0].count, 10);
+        const [usersCount, resumesCount, documentsCount, mockInterviewsCount] = await Promise.all([
+          prisma.user.count(),
+          prisma.resume.count(),
+          prisma.document.count(),
+          prisma.mockInterview.count(),
+        ]);
+        data.usersCount = usersCount;
+        data.resumesCount = resumesCount;
+        data.documentsCount = documentsCount;
+        data.mockInterviewsCount = mockInterviewsCount;
         data.dbHealthy = true;
       } catch (err) {
         console.error('Db Diagnostics query failure:', err);
-      } finally {
-        await pg.end();
       }
     } else {
       const jsonDb = this.readJsonDb();
@@ -328,20 +297,22 @@ class DatabaseManager {
   }
 
   public async savePipelineSession(email: string, data: any): Promise<any> {
-    const pg = await this.getPostgresClient();
-    if (pg) {
+    if (this.usePrisma) {
       try {
-        const query = `
-          INSERT INTO pipeline_sessions (email, data, updated_at) 
-          VALUES ($1, $2, NOW())
-          ON CONFLICT (email) 
-          DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()
-          RETURNING *
-        `;
-        const res = await pg.query(query, [email, JSON.stringify(data)]);
-        return res.rows[0];
-      } finally {
-        await pg.end();
+        const session = await prisma.pipelineSession.upsert({
+          where: { email },
+          update: {
+            data: data as any,
+          },
+          create: {
+            email,
+            data: data as any,
+          },
+        });
+        return session;
+      } catch (err) {
+        console.error('Failed to save pipeline session via Prisma:', err);
+        throw err;
       }
     } else {
       const db = this.readJsonDb();
@@ -363,17 +334,18 @@ class DatabaseManager {
   }
 
   public async getPipelineSession(email: string): Promise<any | null> {
-    const pg = await this.getPostgresClient();
-    if (pg) {
+    if (this.usePrisma) {
       try {
-        const res = await pg.query('SELECT * FROM pipeline_sessions WHERE email = $1', [email]);
-        if (res.rows.length > 0) {
-          const row = res.rows[0];
-          return typeof row.data === 'string' ? JSON.parse(row.data) : row.data;
+        const session = await prisma.pipelineSession.findUnique({
+          where: { email },
+        });
+        if (session) {
+          return typeof session.data === 'string' ? JSON.parse(session.data) : session.data;
         }
         return null;
-      } finally {
-        await pg.end();
+      } catch (err) {
+        console.error('Failed to get pipeline session via Prisma:', err);
+        throw err;
       }
     } else {
       const db = this.readJsonDb();
